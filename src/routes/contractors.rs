@@ -1,9 +1,10 @@
+use axum::extract::State;
+use axum::Json;
+
 use crate::appstate::AppState;
 use crate::controllers::contractors;
 use crate::models::contractors::Contractor;
 use crate::models::response::VecResponse;
-use axum::extract::State;
-use axum::Json;
 
 pub async fn get_contractors(
     State(state): State<AppState>,

@@ -1,8 +1,7 @@
+use crate::appstate::AppState;
 use crate::models::contractors::Contractor;
 use crate::models::contractors::ContractorDocument;
 use futures::stream::TryStreamExt;
-
-use crate::appstate::AppState;
 
 pub async fn find_contractors(state: AppState) -> mongodb::error::Result<Vec<Contractor>> {
     let collection = state.db.collection::<ContractorDocument>("contractors");

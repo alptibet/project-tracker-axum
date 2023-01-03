@@ -1,6 +1,5 @@
-use serde::{Deserialize, Serialize};
-
 use crate::models::contractors::Contractor;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VecResponse<DocType> {

@@ -1,8 +1,7 @@
+use crate::appstate::AppState;
 use mongodb::options::ClientOptions;
 use mongodb::{Client, Database};
 use std::env;
-
-use crate::appstate::AppState;
 
 pub async fn init_db() -> AppState {
     match connect().await {
