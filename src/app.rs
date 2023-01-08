@@ -2,7 +2,7 @@ use crate::db;
 use crate::routes;
 use axum::Router;
 
-pub async fn run_app() -> Router {
+pub async fn run_app() -> Router<AppState> {
     let db = db::init_db().await;
     Router::new().merge(
         Router::new().nest(
