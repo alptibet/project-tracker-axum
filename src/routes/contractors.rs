@@ -1,17 +1,7 @@
-use axum::extract::State;
-use axum::response::Html;
-use axum::{routing::get, Json, Router};
+use axum::{extract::State, Json};
 use serde_json::{json, Value};
 
 use crate::appstate::AppState;
-use crate::controllers::contractors;
-use crate::errors::AppError;
-use crate::models::contractors::Contractor;
-use crate::models::response::VecResponse;
-
-pub fn create_routes() -> Router {
-    Router::new().route("/contractors", get(handler))
-}
 
 // async fn get_contractors(
 //     State(state): State<AppState>,
@@ -25,7 +15,8 @@ pub fn create_routes() -> Router {
 //     }
 // }
 
-async fn handler() -> Json<Value> {
+pub async fn api_hello(State(state): State<AppState>) -> Json<Value> {
+    println!("{:?}", state);
     Json(json!({
         "name":"Alp"
     }))

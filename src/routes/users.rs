@@ -3,8 +3,6 @@ use axum::response::Html;
 use axum::{routing::get, Json, Router};
 
 use crate::appstate::AppState;
-use crate::controllers::contractors;
-use crate::errors::AppError;
 use crate::models::contractors::Contractor;
 use crate::models::response::VecResponse;
 

@@ -1,15 +1,11 @@
-use crate::db;
-use crate::routes;
-use axum::Router;
+use crate::routes::create_routes;
 
-pub async fn run_app() -> Router<AppState> {
-    let db = db::init_db().await;
-    Router::new().merge(
-        Router::new().nest(
-            "/api/v1",
-            Router::new()
-                .merge(routes::contractors::create_routes())
-                .merge(routes::users::create_routes()),
-        ),
-    )
+pub async fn run_app() {
+    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], 3000));
+
+    let app = create_routes().await;
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .expect("FAILED TO START SERVER");
 }
