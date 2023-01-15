@@ -5,19 +5,16 @@ use crate::models::contractors::Contractor;
 use crate::models::response::{DocResponse, VecResponse};
 use axum::{extract::Path, extract::State, Json};
 use mongodb::bson::oid::ObjectId;
-use serde_json::{json, Value};
 
 pub async fn get_contractors(
     State(state): State<AppState>,
-) -> Result<Json<VecResponse<Contractor>>, Json<Value>> {
+) -> Result<Json<VecResponse<Contractor>>, AppError> {
     match contractors::get_all(&state.db).await {
         Ok(_contractors_doc) => Ok(Json(VecResponse {
             message: "Success".to_string(),
             data: _contractors_doc,
         })),
-        Err(_error) => Err(Json(json!({
-            "message":"Error",
-        }))),
+        Err(_error) => Err(AppError::NotFound),
     }
 }
 
