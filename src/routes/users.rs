@@ -13,3 +13,4 @@ pub fn create_routes() -> Router {
 async fn handler() -> Html<&'static str> {
     Html("<h1>Hello From Users!</h1>")
 }
+

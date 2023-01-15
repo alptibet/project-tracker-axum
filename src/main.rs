@@ -5,6 +5,8 @@ mod appstate;
 mod db;
 mod models;
 mod routes;
+mod controllers;
+mod errors;
 
 #[tokio::main]
 async fn main() {
