@@ -46,11 +46,17 @@ pub async fn insert_one(
 ) -> mongodb::error::Result<Contractor> {
     let collection = db.collection::<Document>("contractors");
     let contractor_document = doc! {"name": &input.name};
-    let insert_one_result = collection.insert_one(contractor_document, None).await?;
+    let insert_one_result = collection.insert_one(contractor_document, None).await;
+    match insert_one_result {
+        Ok(_result) => {
     let contractor_name = &input.name.to_string();
     let contractor_json = Contractor {
-        _id: insert_one_result.inserted_id.to_string(),
+        _id: "deneme".to_string(),
         name: contractor_name.to_string(),
     };
     Ok(contractor_json)
+        }
+    Err(_error) => Err(_error)
+    }
 }
+

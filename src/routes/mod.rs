@@ -10,7 +10,7 @@ use tower_http::trace::TraceLayer;
 use self::contractors::{get_all_contractors, get_one_contractor, insert_contractor};
 
 pub async fn create_routes() -> Router {
-    tracing_subscriber::fmt().with_max_level(tracing::Level::DEBUG).init();
+    tracing_subscriber::fmt().with_max_level(tracing::Level::INFO).init();
     let db = init_db().await;
     Router::new()
         .route("/api/v1/contractors", get(get_all_contractors))

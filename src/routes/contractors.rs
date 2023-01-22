@@ -52,7 +52,12 @@ pub async fn insert_contractor(
             message: "Success".to_string(),
             data: _contractor_doc,
         })),
-        Err(_error) => Err(AppError::CannotCreate),
+        Err(_error) => {
+            let res = _error.to_string();
+            if res.contains("code: 11000") {
+                return Err(AppError::DuplicateRecord);
+            }
+            Err(AppError::InternalServerError)
+        }
     }
 }
-

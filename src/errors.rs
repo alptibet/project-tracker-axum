@@ -11,10 +11,10 @@ pub enum AppError {
     // WrongCredentials,
     // MissingCredential,
     // TokenCreation,
-    // InternalServerError,
+    InternalServerError,
     // UserDoesNotExist,
     // UserAlreadyExists,
-    CannotCreate,
+    DuplicateRecord,
     OidParseError,
     NotFound,
 }
@@ -24,8 +24,13 @@ impl IntoResponse for AppError {
         let (status, err_msg) = match self {
             Self::OidParseError => (StatusCode::BAD_REQUEST, "Cannot parse oid"),
             Self::NotFound => (StatusCode::NOT_FOUND, "Requested resource does not exist"),
-            Self::CannotCreate => (StatusCode::BAD_REQUEST, "Could not create resouce"),
+            Self::DuplicateRecord => (StatusCode::BAD_REQUEST, "Duplicate record found"),
+            Self::InternalServerError => (StatusCode::BAD_REQUEST, "Something went wrong"),
         };
-        (status, Json(json!({ "error": err_msg }))).into_response()
+        (
+            status,
+            Json(json!({"status":"Failure", "message": err_msg })),
+        )
+            .into_response()
     }
 }
