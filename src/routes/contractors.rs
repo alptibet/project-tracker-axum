@@ -1,12 +1,15 @@
 use crate::appstate::AppState;
 use crate::controllers::contractors;
 use crate::errors::AppError;
-use crate::models::contractors::Contractor;
+use crate::models::contractors::{Contractor, ContractorInput};
 use crate::models::response::{DocResponse, VecResponse};
-use axum::{extract::Path, extract::State, Json};
+use axum::{
+    extract::{Path, State},
+    Json,
+};
 use mongodb::bson::oid::ObjectId;
 
-pub async fn get_contractors(
+pub async fn get_all_contractors(
     State(state): State<AppState>,
 ) -> Result<Json<VecResponse<Contractor>>, AppError> {
     match contractors::get_all(&state.db).await {
@@ -35,7 +38,21 @@ pub async fn get_one_contractor(
                 message: "Success".to_string(),
                 data: _contractor_doc.unwrap(),
             }))
-        },
+        }
         Err(_error) => Err(AppError::NotFound),
     }
 }
+
+pub async fn insert_contractor(
+    State(state): State<AppState>,
+    input: Json<ContractorInput>,
+) -> Result<Json<DocResponse<Contractor>>, AppError> {
+    match contractors::insert_one(&state.db, input).await {
+        Ok(_contractor_doc) => Ok(Json(DocResponse {
+            message: "Success".to_string(),
+            data: _contractor_doc,
+        })),
+        Err(_error) => Err(AppError::CannotCreate),
+    }
+}
+
