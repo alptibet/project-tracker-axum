@@ -61,3 +61,4 @@ pub async fn insert_contractor(
         }
     }
 }
+
