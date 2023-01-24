@@ -2,7 +2,7 @@ use crate::appstate::AppState;
 use crate::controllers::contractors;
 use crate::errors::AppError;
 use crate::models::contractors::{Contractor, ContractorInput};
-use crate::models::response::{DocResponse, VecResponse, MessageResponse};
+use crate::models::response::{DocResponse, MessageResponse, VecResponse};
 use axum::{
     extract::{Path, State},
     Json,
@@ -62,7 +62,10 @@ pub async fn insert_contractor(
     }
 }
 
-pub async fn delete_contractor(Path(_id): Path<String> ,State(state): State<AppState>) -> Result<Json<MessageResponse>, AppError> {
+pub async fn delete_contractor(
+    Path(_id): Path<String>,
+    State(state): State<AppState>,
+) -> Result<Json<MessageResponse>, AppError> {
     let oid = ObjectId::parse_str(_id);
     if oid.is_err() {
         return Err(AppError::OidParseError);
@@ -75,7 +78,7 @@ pub async fn delete_contractor(Path(_id): Path<String> ,State(state): State<AppS
             Ok(Json(MessageResponse {
                 message: "success".to_string(),
             }))
-        },
+        }
         Err(_error) => Err(AppError::InternalServerError),
     }
 }

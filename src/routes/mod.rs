@@ -7,7 +7,9 @@ use axum::{
 
 use tower_http::trace::TraceLayer;
 
-use self::contractors::{get_all_contractors, get_one_contractor, insert_contractor, delete_contractor};
+use self::contractors::{
+    delete_contractor, get_all_contractors, get_one_contractor, insert_contractor,
+};
 
 pub async fn create_routes() -> Router {
     tracing_subscriber::fmt()
