@@ -55,3 +55,13 @@ pub async fn insert_one(
     Ok(contractor_json)
 }
 
+pub async fn delete_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<String>> {
+    let collection = db.collection::<Document>("contractors");
+    let contractor_doc = collection
+        .find_one_and_delete(doc! {"_id": oid}, None)
+        .await?;
+    if contractor_doc.is_none() {
+        return Ok(None);
+    }
+    Ok(Some("Document deleted".to_string()))
+}
