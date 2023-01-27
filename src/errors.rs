@@ -15,6 +15,7 @@ pub enum AppError {
     // UserDoesNotExist,
     // UserAlreadyExists,
     DuplicateRecord,
+    BadRequest,
     OidParseError,
     NotFound,
 }
@@ -26,6 +27,7 @@ impl IntoResponse for AppError {
             Self::NotFound => (StatusCode::NOT_FOUND, "Requested resource does not exist"),
             Self::DuplicateRecord => (StatusCode::BAD_REQUEST, "Duplicate record found"),
             Self::InternalServerError => (StatusCode::BAD_REQUEST, "Something went wrong"),
+            Self::BadRequest => (StatusCode::BAD_REQUEST, "Unable to complete request"),
         };
         (
             status,

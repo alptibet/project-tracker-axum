@@ -3,6 +3,8 @@ use futures::TryStreamExt;
 use mongodb::bson::oid::ObjectId;
 use mongodb::bson::{doc, Document};
 use mongodb::Database;
+use mongodb::options::FindOneAndUpdateOptions;
+use mongodb::options::ReturnDocument;
 
 use crate::models::contractors::{Contractor, ContractorDocument, ContractorInput};
 
@@ -64,4 +66,30 @@ pub async fn delete_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<
         return Ok(None);
     }
     Ok(Some("Document deleted".to_string()))
+}
+
+pub async fn update_one(db: &Database, oid: ObjectId, input: Json<ContractorInput>) -> mongodb::error::Result<Option<Contractor>> {
+    let collection = db.collection::<ContractorDocument>("contractors");
+    let update_options = FindOneAndUpdateOptions::builder()
+        .return_document(ReturnDocument::After)
+        .build();
+
+    let contractor_doc = collection
+        .find_one_and_update(
+            doc! {"_id": oid},
+            doc! {"$set": {"name": input.name.clone()}},
+            update_options,
+        )
+        .await?;
+    if contractor_doc.is_none() {
+        return Ok(None);
+    }
+
+    let unwrapped_doc = contractor_doc.unwrap();
+    let contractor_json = Contractor {
+        _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name,
+    };
+
+    Ok(Some(contractor_json))
 }
