@@ -1,4 +1,5 @@
 mod contractors;
+mod users;
 use crate::db::init_db;
 use axum::{
     routing::{delete, get, patch, post},

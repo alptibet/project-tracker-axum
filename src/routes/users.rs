@@ -1,16 +1,19 @@
-use axum::extract::State;
-use axum::response::Html;
-use axum::{routing::get, Json, Router};
-
 use crate::appstate::AppState;
-use crate::models::contractors::Contractor;
-use crate::models::response::VecResponse;
+use crate::controllers::users;
+use crate::errors::AppError;
+use crate::models::users::{User, UserInput};
+use crate::models::response::{DocResponse, MessageResponse, VecResponse};
+use axum::extract::{Json, Path, State};
+use mongodb::bson::oid::ObjectId;
 
-pub fn create_routes() -> Router {
-    Router::new().route("/users", get(handler))
+pub async fn get_all_users(
+    State(state): State<AppState>,
+) -> Result<Json<VecResponse<User>>, AppError> {
+    match users::get_all(&state.db).await {
+        Ok(_users_doc) => Ok(Json(VecResponse {
+            message: "Success".to_string(),
+            data: _users_doc,
+        })),
+        Err(_error) => Err(AppError::NotFound),
+    }
 }
-
-async fn handler() -> Html<&'static str> {
-    Html("<h1>Hello From Users!</h1>")
-}
-
