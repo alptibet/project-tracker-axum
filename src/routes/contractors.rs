@@ -99,13 +99,13 @@ pub async fn update_contractor(
                 data: _contractor_doc.unwrap(),
             }))
         }
-       Err(_error) => {
+        Err(_error) => {
             let res = _error.to_string();
-            println!("{:?}", res);
+            println!("{res:?}");
             if res.contains("E11000") {
                 return Err(AppError::DuplicateRecord);
             }
-           Err(AppError::BadRequest)
-        },
+            Err(AppError::BadRequest)
+        }
     }
 }

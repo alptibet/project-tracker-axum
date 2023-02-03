@@ -6,7 +6,7 @@ use std::env;
 pub async fn init_db() -> AppState {
     match connect().await {
         Ok(_database) => AppState { db: _database },
-        Err(_error) => panic!("Could not connect to database...{}", _error),
+        Err(_error) => panic!("Could not connect to database...{_error}"),
     }
 }
 
