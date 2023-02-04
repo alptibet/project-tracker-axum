@@ -13,6 +13,7 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<User>>{
     let mut users: Vec<User> = vec![];
 
     while let Some(result) = cursor.try_next().await? {
+       println!("{result:?}");
         let _id = result._id;
         let name = result.name;
         let surname = result.surname;

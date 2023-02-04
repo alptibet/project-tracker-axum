@@ -2,7 +2,7 @@ use mongodb::bson::datetime::DateTime;
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum UserRole {
     User,
     Admin,
@@ -24,7 +24,7 @@ pub struct User {
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct UserDocument {
     pub _id: ObjectId,
     pub name: String,
