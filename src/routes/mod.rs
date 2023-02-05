@@ -5,7 +5,6 @@ use axum::{
     routing::{delete, get, patch, post},
     Router,
 };
-
 use tower_http::trace::TraceLayer;
 
 use self::{
@@ -13,13 +12,11 @@ use self::{
         delete_contractor, get_all_contractors, get_one_contractor, insert_contractor,
         update_contractor,
     },
-    users::get_all_users,
+    users::{delete_user, get_all_users, get_one_user, signup},
 };
 
 pub async fn create_routes() -> Router {
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::INFO)
-        .init();
+    tracing_subscriber::fmt::init();
     let db = init_db().await;
     Router::new()
         .route("/api/v1/contractors", get(get_all_contractors))
@@ -28,6 +25,9 @@ pub async fn create_routes() -> Router {
         .route("/api/v1/contractors/:id", delete(delete_contractor))
         .route("/api/v1/contractors/:id", patch(update_contractor))
         .route("/api/v1/users", get(get_all_users))
+        .route("/api/v1/users/:id", get(get_one_user))
+        .route("/api/v1/users", post(signup))
+        .route("/api/v1/users", patch(delete_user))
         .layer(TraceLayer::new_for_http())
         .with_state(db)
 }
