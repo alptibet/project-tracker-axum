@@ -47,3 +47,9 @@ pub struct UserInput {
     pub password: String,
     pub passwordConfirm: String,
 }
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize)]
+pub struct UserId {
+    pub _id: String,
+}
