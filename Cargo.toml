@@ -8,14 +8,17 @@ edition = "2021"
 [dependencies]
 axum = "0.6.1"
 bcrypt = "0.14.0"
+chrono = "0.4.23"
+cookie = {version = "0.17.0", features=["private"]}
 dotenv = "0.15.0"
 futures = "0.3.25"
 hyper = {version = "0.14.23", features = ["full"]}
+jsonwebtoken = "8.2.0"
 mongodb = "2.3.1"
 serde = {version = "1.0.152", features=["derive"]}
 serde_json = "1.0.91"
 tokio = {version = "1.23.0", features = ["full"]}
 tower = "0.4.13"
-tower-http = {version = "0.3.5", features = ["trace"]}
+tower-http = {version = "0.3.5", features = ["full"]}
 tracing = "0.1.37"
 tracing-subscriber = {version = "0.3.16", features = ["env-filter"]}

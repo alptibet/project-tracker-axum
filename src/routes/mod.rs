@@ -5,7 +5,7 @@ use axum::{
     routing::{delete, get, patch, post},
     Router,
 };
-use tower_http::trace::TraceLayer;
+use tower_http::{trace::TraceLayer, auth::RequireAuthorizationLayer};
 
 use self::{
     contractors::{
@@ -29,5 +29,6 @@ pub async fn create_routes() -> Router {
         .route("/api/v1/users", post(signup))
         .route("/api/v1/users", patch(delete_user))
         .with_state(db)
+        .layer(RequireAuthorizationLayer::bearer("token"))
         .layer(TraceLayer::new_for_http())
 }

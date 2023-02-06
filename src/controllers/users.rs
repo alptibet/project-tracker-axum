@@ -144,4 +144,3 @@ pub async fn deactivate_user(db: &Database, oid: ObjectId) -> mongodb::error::Re
 
     Ok(Some(user_json))
 }
-

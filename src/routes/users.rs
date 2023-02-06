@@ -5,6 +5,7 @@ use crate::models::response::{DocResponse, MessageResponse, VecResponse};
 use crate::models::users::{User, UserInput, UserId};
 use axum::extract::{Json, Path, State};
 use mongodb::bson::oid::ObjectId;
+use cookie::{Cookie, CookieJar};
 
 pub async fn get_all_users(
     State(state): State<AppState>,
