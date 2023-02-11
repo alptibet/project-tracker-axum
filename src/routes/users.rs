@@ -2,10 +2,10 @@ use crate::appstate::AppState;
 use crate::controllers::users;
 use crate::errors::AppError;
 use crate::models::response::{DocResponse, MessageResponse, VecResponse};
-use crate::models::users::{User, UserInput, UserId};
+use crate::models::users::{User, UserId, UserInput};
 use axum::extract::{Json, Path, State};
-use mongodb::bson::oid::ObjectId;
 use cookie::{Cookie, CookieJar};
+use mongodb::bson::oid::ObjectId;
 
 pub async fn get_all_users(
     State(state): State<AppState>,
@@ -43,7 +43,7 @@ pub async fn get_one_user(
 
 pub async fn delete_user(
     State(state): State<AppState>,
-    input: Json<UserId>
+    input: Json<UserId>,
 ) -> Result<Json<MessageResponse>, AppError> {
     let oid = ObjectId::parse_str(input._id.clone());
     if oid.is_err() {
