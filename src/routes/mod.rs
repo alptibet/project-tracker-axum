@@ -1,12 +1,5 @@
 mod contractors;
 mod users;
-use crate::db::init_db;
-use axum::{
-    routing::{delete, get, patch, post},
-    Router,
-};
-use tower_http::{trace::TraceLayer, auth::RequireAuthorizationLayer};
-
 use self::{
     contractors::{
         delete_contractor, get_all_contractors, get_one_contractor, insert_contractor,
@@ -14,6 +7,12 @@ use self::{
     },
     users::{delete_user, get_all_users, get_one_user, signup},
 };
+use crate::db::init_db;
+use axum::{
+    routing::{delete, get, patch, post},
+    Router,
+};
+use tower_http::trace::TraceLayer;
 
 pub async fn create_routes() -> Router {
     tracing_subscriber::fmt::init();
@@ -29,6 +28,5 @@ pub async fn create_routes() -> Router {
         .route("/api/v1/users", post(signup))
         .route("/api/v1/users", patch(delete_user))
         .with_state(db)
-        .layer(RequireAuthorizationLayer::bearer("token"))
         .layer(TraceLayer::new_for_http())
 }

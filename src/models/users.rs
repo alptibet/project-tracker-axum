@@ -53,9 +53,3 @@ pub struct UserInput {
 pub struct UserId {
     pub _id: String,
 }
-
-#[derive(Deserialize, Serialize)]
-pub struct Claims {
-    pub sub: String,
-    pub exp: usize,
-}

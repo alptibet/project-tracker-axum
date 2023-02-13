@@ -1,9 +1,9 @@
+use crate::models::users::Claims;
 use bcrypt::{verify, BcryptError};
 use chrono::Utc;
+use cookie::Cookie;
 use jsonwebtoken::{encode, EncodingKey, Header};
 use std::env;
-use cookie::Cookie;
-use crate::models::users::Claims;
 
 pub fn create_send_token<'a>(_id: &str) -> Cookie<'a> {
     Cookie::build("token", sign_token(_id))
@@ -37,4 +37,3 @@ pub fn sign_token(_id: &str) -> String {
 pub fn check_password(password: &str, hashed_password: &str) -> Result<bool, BcryptError> {
     verify(password, hashed_password)
 }
-
