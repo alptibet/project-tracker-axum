@@ -2,9 +2,8 @@ use crate::appstate::AppState;
 use crate::controllers::users;
 use crate::errors::AppError;
 use crate::models::response::{DocResponse, MessageResponse, VecResponse};
-use crate::models::users::{User, UserId, UserInput};
+use crate::models::users::{User, UserId};
 use axum::extract::{Json, Path, State};
-use cookie::{Cookie, CookieJar};
 use mongodb::bson::oid::ObjectId;
 
 pub async fn get_all_users(
@@ -62,21 +61,3 @@ pub async fn delete_user(
     }
 }
 
-pub async fn signup(
-    State(state): State<AppState>,
-    input: Json<UserInput>,
-) -> Result<Json<DocResponse<User>>, AppError> {
-    match users::insert_one(&state.db, input).await {
-        Ok(_user_doc) => Ok(Json(DocResponse {
-            message: "Success".to_string(),
-            data: _user_doc,
-        })),
-        Err(_error) => {
-            let res = _error.to_string();
-            if res.contains("code: 11000") {
-                return Err(AppError::DuplicateRecord);
-            }
-            Err(AppError::BadRequest)
-        }
-    }
-}

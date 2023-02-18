@@ -37,16 +37,6 @@ pub struct UserDocument {
     pub role: UserRole,
 }
 
-#[allow(non_snake_case)]
-#[derive(Deserialize, Serialize)]
-pub struct UserInput {
-    pub name: String,
-    pub surname: String,
-    pub username: String,
-    pub email: String,
-    pub password: String,
-    pub passwordConfirm: String,
-}
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize)]

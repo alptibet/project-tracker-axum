@@ -1,8 +1,11 @@
-use crate::models::users::Claims;
+use crate::models::auth::{AuthInfo, Claims};
+use crate::models::users::UserDocument;
 use bcrypt::{verify, BcryptError};
 use chrono::Utc;
 use cookie::Cookie;
 use jsonwebtoken::{encode, EncodingKey, Header};
+use mongodb::bson::doc;
+use mongodb::Database;
 use std::env;
 
 pub fn create_send_token<'a>(_id: &str) -> Cookie<'a> {
@@ -36,4 +39,21 @@ pub fn sign_token(_id: &str) -> String {
 
 pub fn check_password(password: &str, hashed_password: &str) -> Result<bool, BcryptError> {
     verify(password, hashed_password)
+}
+
+pub async fn match_auth(db: &Database, username: &str) -> mongodb::error::Result<Option<AuthInfo>> {
+    let collection = db.collection::<UserDocument>("users");
+    let user_doc = collection
+        .find_one(doc! {"username":username}, None)
+        .await?;
+    if user_doc.is_none() {
+        return Ok(None);
+    }
+    let unwrapped_doc = user_doc.unwrap();
+    let match_auth = AuthInfo {
+        _id: unwrapped_doc._id.to_string(),
+        password: unwrapped_doc.password,
+    };
+
+    Ok(Some(match_auth))
 }

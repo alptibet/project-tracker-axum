@@ -1,4 +1,5 @@
-use crate::models::users::{User, UserDocument, UserRole, UserInput};
+use crate::models::users::{User, UserDocument, UserRole};
+use crate::models::auth::UserInput;
 use axum::Json;
 use bcrypt::hash;
 use futures::TryStreamExt;
