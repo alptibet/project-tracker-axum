@@ -1,5 +1,5 @@
-use crate::models::users::{User, UserDocument, UserRole};
 use crate::models::auth::UserInput;
+use crate::models::users::{User, UserDocument, UserRole};
 use axum::Json;
 use bcrypt::hash;
 use futures::TryStreamExt;
@@ -9,7 +9,7 @@ use mongodb::options::FindOneAndUpdateOptions;
 use mongodb::options::ReturnDocument;
 use mongodb::Database;
 
-pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<User>>{
+pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<User>> {
     let collection = db.collection::<UserDocument>("users");
     let mut cursor = collection.find(None, None).await?;
     let mut users: Vec<User> = vec![];
@@ -41,7 +41,6 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<User>>{
         };
         users.push(user_json);
     }
-
     Ok(users)
 }
 
@@ -88,8 +87,7 @@ pub async fn insert_one(db: &Database, input: Json<UserInput>) -> mongodb::error
         "role": "User".to_string(),
     };
 
-    let insert_one_result = collection.insert_one(&user_document, None).await?;
-
+    let insert_one_result = collection.insert_one(user_document, None).await?;
     let name = &input.name;
     let surname = &input.surname;
     let username = &input.username;

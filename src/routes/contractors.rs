@@ -101,7 +101,6 @@ pub async fn update_contractor(
         }
         Err(_error) => {
             let res = _error.to_string();
-            println!("{res:?}");
             if res.contains("E11000") {
                 return Err(AppError::DuplicateRecord);
             }
