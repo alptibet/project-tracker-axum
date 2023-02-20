@@ -14,6 +14,7 @@ use axum::{
     routing::{delete, get, patch, post},
     Router,
 };
+use tower_cookies::CookieManagerLayer;
 use tower_http::trace::TraceLayer;
 
 pub async fn create_routes() -> Router {
@@ -30,5 +31,6 @@ pub async fn create_routes() -> Router {
         .route("/api/v1/users/:id", get(get_one_user))
         .route("/api/v1/users", patch(delete_user))
         .with_state(db)
+        .layer(CookieManagerLayer::new())
         .layer(TraceLayer::new_for_http())
 }

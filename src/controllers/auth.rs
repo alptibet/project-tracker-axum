@@ -2,11 +2,11 @@ use crate::models::auth::{AuthInfo, Claims};
 use crate::models::users::UserDocument;
 use bcrypt::{verify, BcryptError};
 use chrono::Utc;
-use cookie::Cookie;
 use jsonwebtoken::{encode, EncodingKey, Header};
 use mongodb::bson::doc;
 use mongodb::Database;
 use std::env;
+use tower_cookies::Cookie;
 
 pub fn create_send_token<'a>(_id: &str) -> Cookie<'a> {
     Cookie::build("token", sign_token(_id))

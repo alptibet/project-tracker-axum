@@ -5,13 +5,13 @@ use crate::errors::AppError;
 use crate::models::auth::UserInput;
 use crate::models::response::MessageResponse;
 use axum::extract::{Json, State};
-use cookie::{Cookie, CookieJar};
+use tower_cookies::Cookies;
 
 pub async fn signup(
     State(state): State<AppState>,
+    cookies: Cookies,
     input: Json<UserInput>,
 ) -> Result<Json<MessageResponse>, AppError> {
-    println!("TEST");
     match users::insert_one(&state.db, input).await {
         Ok(_user_doc) => {
             match auth::match_auth(&state.db, &_user_doc.username).await {
@@ -20,9 +20,7 @@ pub async fn signup(
                         return Err(AppError::BadRequest);
                     }
                     let token = auth::create_send_token(&_auth_info.unwrap()._id);
-                    let mut jar = CookieJar::new();
-                    println!("{token:?}");
-                    jar.add(token);
+                    cookies.add(token);
                 }
                 Err(_error) => (),
             }
