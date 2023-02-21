@@ -6,7 +6,10 @@ use jsonwebtoken::{encode, EncodingKey, Header};
 use mongodb::bson::doc;
 use mongodb::Database;
 use std::env;
-use tower_cookies::Cookie;
+use tower_cookies::{
+    cookie::time::{Duration, OffsetDateTime},
+    Cookie,
+};
 
 pub fn create_send_token<'a>(_id: &str) -> Cookie<'a> {
     Cookie::build("token", sign_token(_id))
@@ -39,6 +42,16 @@ pub fn sign_token(_id: &str) -> String {
 
 pub fn check_password(password: &str, hashed_password: &str) -> Result<bool, BcryptError> {
     verify(password, hashed_password)
+}
+
+pub fn disable_token<'a>() -> Cookie<'a> {
+    let exp = OffsetDateTime::now_utc() + Duration::seconds(10);
+    Cookie::build("token", "byebye")
+        .path("/")
+        .secure(false)
+        .http_only(true)
+        .expires(exp)
+        .finish()
 }
 
 pub async fn match_auth(db: &Database, username: &str) -> mongodb::error::Result<Option<AuthInfo>> {

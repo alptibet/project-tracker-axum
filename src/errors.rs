@@ -8,11 +8,11 @@ use serde_json::json;
 #[derive(Debug)]
 pub enum AppError {
     // InvalidToken,
-    // WrongCredentials,
+    WrongCredentials,
     // MissingCredential,
     // TokenCreation,
     InternalServerError,
-    // UserDoesNotExist,
+    UserDoesNotExist,
     // UserAlreadyExists,
     DuplicateRecord,
     BadRequest,
@@ -28,6 +28,8 @@ impl IntoResponse for AppError {
             Self::DuplicateRecord => (StatusCode::BAD_REQUEST, "Duplicate record found"),
             Self::InternalServerError => (StatusCode::BAD_REQUEST, "Something went wrong"),
             Self::BadRequest => (StatusCode::BAD_REQUEST, "Unable to complete request"),
+            Self::UserDoesNotExist => (StatusCode::BAD_REQUEST, "User does not exist"),
+            Self::WrongCredentials => (StatusCode::UNAUTHORIZED, "Wrong user credentials"),
         };
         (
             status,

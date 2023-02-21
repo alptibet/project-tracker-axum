@@ -2,7 +2,7 @@ use crate::appstate::AppState;
 use crate::controllers::auth;
 use crate::controllers::users;
 use crate::errors::AppError;
-use crate::models::auth::UserInput;
+use crate::models::auth::{UserInput, UserLogin};
 use crate::models::response::MessageResponse;
 use axum::extract::{Json, State};
 use tower_cookies::Cookies;
@@ -30,4 +30,39 @@ pub async fn signup(
         }
         Err(_error) => Err(AppError::BadRequest),
     }
+}
+
+pub async fn login(
+    State(state): State<AppState>,
+    cookies: Cookies,
+    input: Json<UserLogin>,
+) -> Result<Json<MessageResponse>, AppError> {
+    let match_auth = match auth::match_auth(&state.db, &input.username).await {
+        Ok(_match_auth) => {
+            if _match_auth.is_none() {
+                return Err(AppError::UserDoesNotExist);
+            }
+            Ok(_match_auth.unwrap())
+        }
+        Err(_error) => Err(AppError::BadRequest),
+    };
+    let auth_unwrapped = match_auth.unwrap();
+    match auth::check_password(&input.password, &auth_unwrapped.password) {
+        Ok(_match) => {
+            if _match {
+                cookies.add(auth::create_send_token(&auth_unwrapped._id));
+                Ok(Json(MessageResponse {
+                    message: "Logged in successfully".to_string(),
+                }))
+            } else {
+                Err(AppError::WrongCredentials)
+            }
+        }
+        Err(_error) => Err(AppError::InternalServerError),
+    }
+}
+
+pub async fn logout(cookies: Cookies) {
+    let token = auth::disable_token();
+    cookies.add(token);
 }
