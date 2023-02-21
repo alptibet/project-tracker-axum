@@ -2,14 +2,14 @@ mod auth;
 mod contractors;
 mod users;
 use self::{
-    auth::{authenticate_user, login, logout, signup},
+    auth::{login, logout, signup},
     contractors::{
         delete_contractor, get_all_contractors, get_one_contractor, insert_contractor,
         update_contractor,
     },
     users::{delete_user, get_all_users, get_one_user},
 };
-use crate::db::init_db;
+use crate::{controllers::auth::authenticate_user, db::init_db};
 use axum::{
     middleware,
     routing::{delete, get, patch, post},

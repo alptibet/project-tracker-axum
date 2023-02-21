@@ -1,7 +1,14 @@
 use crate::models::auth::{AuthInfo, Claims};
 use crate::models::users::UserDocument;
+use axum::{
+    extract::TypedHeader,
+    http::{Request, StatusCode},
+    middleware::Next,
+    response::Response,
+};
 use bcrypt::{verify, BcryptError};
 use chrono::Utc;
+use headers;
 use jsonwebtoken::{encode, EncodingKey, Header};
 use mongodb::bson::doc;
 use mongodb::Database;
@@ -69,4 +76,17 @@ pub async fn match_auth(db: &Database, username: &str) -> mongodb::error::Result
     };
 
     Ok(Some(match_auth))
+}
+
+pub async fn authenticate_user<B>(
+    TypedHeader(cookie): TypedHeader<headers::Cookie>,
+    request: Request<B>,
+    next: Next<B>,
+) -> Result<Response, StatusCode> {
+    let value = cookie.get("token");
+    println!("{value:?}");
+    let bearer = request.headers().get("authorization");
+    println!("{bearer:?}");
+    let response = next.run(request).await;
+    Ok(response)
 }
