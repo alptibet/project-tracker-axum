@@ -2,7 +2,7 @@ mod auth;
 mod contractors;
 mod users;
 use self::{
-    auth::{login, logout, signup},
+    auth::{authenticate_user, login, logout, signup},
     contractors::{
         delete_contractor, get_all_contractors, get_one_contractor, insert_contractor,
         update_contractor,
@@ -11,9 +11,11 @@ use self::{
 };
 use crate::db::init_db;
 use axum::{
+    middleware,
     routing::{delete, get, patch, post},
     Router,
 };
+
 use tower_cookies::CookieManagerLayer;
 use tower_http::trace::TraceLayer;
 
@@ -33,6 +35,7 @@ pub async fn create_routes() -> Router {
         .route("/api/v1/users/:id", get(get_one_user))
         .route("/api/v1/users", patch(delete_user))
         .with_state(db)
+        .layer(middleware::from_fn(authenticate_user))
         .layer(CookieManagerLayer::new())
         .layer(TraceLayer::new_for_http())
 }

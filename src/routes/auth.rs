@@ -4,7 +4,17 @@ use crate::controllers::users;
 use crate::errors::AppError;
 use crate::models::auth::{UserInput, UserLogin};
 use crate::models::response::MessageResponse;
-use axum::extract::{Json, State};
+use axum::headers::authorization::Bearer;
+use axum::headers::Authorization;
+use axum::{
+    extract::{Json, State, TypedHeader},
+    http::{Request, StatusCode},
+    middleware::Next,
+    response::Response,
+};
+use headers::Cookie;
+// use axum::http::Request;
+// use axum::middleware::Next;
 use tower_cookies::Cookies;
 
 pub async fn signup(
@@ -65,4 +75,15 @@ pub async fn login(
 pub async fn logout(cookies: Cookies) {
     let token = auth::disable_token();
     cookies.add(token);
+}
+
+pub async fn authenticate_user<B>(
+    TypedHeader(cookie): TypedHeader<Cookie>,
+    request: Request<B>,
+    next: Next<B>,
+) -> Result<Response, StatusCode> {
+    let value = cookie.get("token");
+    println!("{value:?}");
+    let response = next.run(request).await;
+    Ok(response)
 }
