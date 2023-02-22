@@ -1,3 +1,4 @@
+use crate::errors::AppError;
 use crate::models::auth::{AuthInfo, Claims};
 use crate::models::users::UserDocument;
 use axum::{
@@ -8,7 +9,7 @@ use axum::{
 };
 use bcrypt::{verify, BcryptError};
 use chrono::Utc;
-use headers;
+use headers::{self, HeaderValue};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use mongodb::bson::doc;
 use mongodb::Database;
@@ -80,13 +81,27 @@ pub async fn match_auth(db: &Database, username: &str) -> mongodb::error::Result
 
 pub async fn authenticate_user<B>(
     TypedHeader(cookie): TypedHeader<headers::Cookie>,
-    request: Request<B>,
+    req: Request<B>,
     next: Next<B>,
-) -> Result<Response, StatusCode> {
-    let value = cookie.get("token");
-    println!("{value:?}");
-    let bearer = request.headers().get("authorization");
-    println!("{bearer:?}");
-    let response = next.run(request).await;
+) -> Result<Response, AppError> {
+    let token: Option<String>;
+    let auth_bearer = req.headers().get("authorization");
+    let cookie_val = cookie.get("token");
+    if auth_bearer.is_none() && cookie_val.is_none() {
+        return Err(AppError::BadRequest); //Change with not authorized
+    }
+
+    if let Some(_auth_bearer) = auth_bearer {
+        let bearer: Vec<&str> = auth_bearer.unwrap().to_str().unwrap().split(' ').collect();
+        token = Some(bearer[1].to_string());
+    } else {
+        token = Some(cookie_val.unwrap().to_string());
+    } //Shall we do error handling here?
+      //check if token is valid and continue accordingly
+    let response = next.run(req).await;
     Ok(response)
+}
+
+async fn is_valid_token() -> bool {
+    unimplemented!()
 }

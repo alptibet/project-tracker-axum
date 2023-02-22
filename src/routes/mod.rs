@@ -23,9 +23,6 @@ pub async fn create_routes() -> Router {
     tracing_subscriber::fmt::init();
     let db = init_db().await;
     Router::new()
-        .route("/api/v1/signup", post(signup))
-        .route("/api/v1/login", post(login))
-        .route("/api/v1/logout", post(logout))
         .route("/api/v1/contractors", get(get_all_contractors))
         .route("/api/v1/contractors/:id", get(get_one_contractor))
         .route("/api/v1/contractors", post(insert_contractor))
@@ -34,8 +31,11 @@ pub async fn create_routes() -> Router {
         .route("/api/v1/users", get(get_all_users))
         .route("/api/v1/users/:id", get(get_one_user))
         .route("/api/v1/users", patch(delete_user))
-        .with_state(db)
         .layer(middleware::from_fn(authenticate_user))
+        .route("/api/v1/signup", post(signup))
+        .route("/api/v1/login", post(login))
+        .route("/api/v1/logout", post(logout))
+        .with_state(db)
         .layer(CookieManagerLayer::new())
         .layer(TraceLayer::new_for_http())
 }
