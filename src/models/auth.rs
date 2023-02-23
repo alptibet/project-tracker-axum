@@ -18,6 +18,11 @@ pub struct AuthInfo {
     pub password: String,
 }
 
+#[derive(Deserialize, Serialize)]
+pub struct UserId {
+    pub _id: String,
+}
+
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize)]
 pub struct UserInput {

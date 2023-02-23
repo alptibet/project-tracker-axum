@@ -7,7 +7,7 @@ use serde_json::json;
 
 #[derive(Debug)]
 pub enum AppError {
-    // InvalidToken,
+    NotAuthorized,
     WrongCredentials,
     // MissingCredential,
     // TokenCreation,
@@ -30,6 +30,7 @@ impl IntoResponse for AppError {
             Self::BadRequest => (StatusCode::BAD_REQUEST, "Unable to complete request"),
             Self::UserDoesNotExist => (StatusCode::BAD_REQUEST, "User does not exist"),
             Self::WrongCredentials => (StatusCode::UNAUTHORIZED, "Wrong user credentials"),
+            Self::NotAuthorized => (StatusCode::UNAUTHORIZED, "You are not authorized"),
         };
         (
             status,

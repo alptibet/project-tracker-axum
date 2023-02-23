@@ -31,7 +31,10 @@ pub async fn create_routes() -> Router {
         .route("/api/v1/users", get(get_all_users))
         .route("/api/v1/users/:id", get(get_one_user))
         .route("/api/v1/users", patch(delete_user))
-        .layer(middleware::from_fn(authenticate_user))
+        .layer(middleware::from_fn_with_state(
+            db.clone(),
+            authenticate_user,
+        ))
         .route("/api/v1/signup", post(signup))
         .route("/api/v1/login", post(login))
         .route("/api/v1/logout", post(logout))
