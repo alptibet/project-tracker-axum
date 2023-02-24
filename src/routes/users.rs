@@ -60,4 +60,3 @@ pub async fn delete_user(
         Err(_error) => Err(AppError::BadRequest),
     }
 }
-

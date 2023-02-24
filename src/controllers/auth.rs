@@ -6,7 +6,6 @@ use axum::extract::State;
 use axum::{extract::TypedHeader, http::Request, middleware::Next, response::Response};
 use bcrypt::{verify, BcryptError};
 use chrono::Utc;
-use headers;
 use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use mongodb::bson::doc;
@@ -52,7 +51,7 @@ pub fn check_password(password: &str, hashed_password: &str) -> Result<bool, Bcr
 }
 
 pub fn disable_token<'a>() -> Cookie<'a> {
-    let exp = OffsetDateTime::now_utc() + Duration::seconds(100);
+    let exp = OffsetDateTime::now_utc() + Duration::seconds(10);
     Cookie::build("token", "byebye")
         .path("/")
         .secure(false)
@@ -80,14 +79,13 @@ pub async fn match_auth(db: &Database, username: &str) -> mongodb::error::Result
 
 pub async fn authenticate_user<B>(
     State(state): State<AppState>,
-    TypedHeader(cookie): TypedHeader<headers::Cookie>,
+    cookies: Option<TypedHeader<headers::Cookie>>,
     req: Request<B>,
     next: Next<B>,
 ) -> Result<Response, AppError> {
     let token: Option<String>;
     let auth_bearer = req.headers().get("authorization");
-    let cookie_val = cookie.get("token");
-    if auth_bearer.is_none() && cookie_val.is_none() {
+    if auth_bearer.is_none() && cookies.is_none() {
         return Err(AppError::NotAuthorized);
     }
 
@@ -95,7 +93,7 @@ pub async fn authenticate_user<B>(
         let bearer: Vec<&str> = auth_bearer.unwrap().to_str().unwrap().split(' ').collect();
         token = Some(bearer[1].to_string());
     } else {
-        token = Some(cookie_val.unwrap().to_string());
+        token = Some(cookies.unwrap().get("token").unwrap().to_string());
     } //Shall we do error handling here?
     if is_valid_token(&state.db, token).await {
         let response = next.run(req).await;

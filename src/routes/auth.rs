@@ -8,7 +8,7 @@ use axum::extract::{Json, State};
 use tower_cookies::Cookies;
 
 pub async fn signup(
-    State(state): State<AppState>,
+    state: State<AppState>,
     cookies: Cookies,
     input: Json<UserInput>,
 ) -> Result<Json<MessageResponse>, AppError> {
@@ -28,12 +28,18 @@ pub async fn signup(
                 message: "success".to_string(),
             }))
         }
-        Err(_error) => Err(AppError::BadRequest),
+        Err(_error) => {
+            let res = _error.to_string();
+            if res.contains("code: 11000") {
+                return Err(AppError::UserAlreadyExists);
+            }
+            Err(AppError::InternalServerError)
+        }
     }
 }
 
 pub async fn login(
-    State(state): State<AppState>,
+    state: State<AppState>,
     cookies: Cookies,
     input: Json<UserLogin>,
 ) -> Result<Json<MessageResponse>, AppError> {

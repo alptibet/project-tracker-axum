@@ -13,7 +13,7 @@ pub enum AppError {
     // TokenCreation,
     InternalServerError,
     UserDoesNotExist,
-    // UserAlreadyExists,
+    UserAlreadyExists,
     DuplicateRecord,
     BadRequest,
     OidParseError,
@@ -30,7 +30,11 @@ impl IntoResponse for AppError {
             Self::BadRequest => (StatusCode::BAD_REQUEST, "Unable to complete request"),
             Self::UserDoesNotExist => (StatusCode::BAD_REQUEST, "User does not exist"),
             Self::WrongCredentials => (StatusCode::UNAUTHORIZED, "Wrong user credentials"),
-            Self::NotAuthorized => (StatusCode::UNAUTHORIZED, "You are not authorized"),
+            Self::UserAlreadyExists => (StatusCode::UNAUTHORIZED, "This user already exists"),
+            Self::NotAuthorized => (
+                StatusCode::UNAUTHORIZED,
+                "You are either logged out or not authorized to view this resource.",
+            ),
         };
         (
             status,
