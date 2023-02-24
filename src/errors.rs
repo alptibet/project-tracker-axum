@@ -9,8 +9,6 @@ use serde_json::json;
 pub enum AppError {
     NotAuthorized,
     WrongCredentials,
-    // MissingCredential,
-    // TokenCreation,
     InternalServerError,
     UserDoesNotExist,
     UserAlreadyExists,
