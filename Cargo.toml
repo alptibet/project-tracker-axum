@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 axum = {version = "0.6.1", features = ["headers"]}
-axum-extra = {version = "0.5.0", features = ["cookie"]}
 bcrypt = "0.14.0"
 chrono = "0.4.23"
 dotenv = "0.15.0"

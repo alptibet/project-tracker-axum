@@ -1,7 +1,7 @@
 use crate::appstate::AppState;
 use crate::errors::AppError;
-use crate::models::auth::{AuthInfo, Claims, UserId};
-use crate::models::users::UserDocument;
+use crate::models::auth::{AuthInfo, Claims};
+use crate::models::users::{User, UserDocument, UserRole};
 use axum::extract::State;
 use axum::{extract::TypedHeader, http::Request, middleware::Next, response::Response};
 use bcrypt::{verify, BcryptError};
@@ -80,7 +80,7 @@ pub async fn match_auth(db: &Database, username: &str) -> mongodb::error::Result
 pub async fn authenticate_user<B>(
     State(state): State<AppState>,
     cookies: Option<TypedHeader<headers::Cookie>>,
-    req: Request<B>,
+    mut req: Request<B>,
     next: Next<B>,
 ) -> Result<Response, AppError> {
     let token: Option<String>;
@@ -96,6 +96,7 @@ pub async fn authenticate_user<B>(
         token = Some(cookies.unwrap().get("token").unwrap().to_string());
     } //Shall we do error handling here?
     if is_valid_token(&state.db, token).await {
+        req.extensions_mut().insert(12);
         let response = next.run(req).await;
         Ok(response)
     } else {
@@ -113,7 +114,7 @@ async fn is_valid_token(db: &Database, token: Option<String>) -> bool {
 
     if let Ok(_payload) = payload {
         let oid = ObjectId::parse_str(_payload.claims.sub).unwrap();
-        match match_user_id(db, oid).await {
+        match match_user(db, oid).await {
             Ok(_valid_user) => {
                 if _valid_user.is_none() {
                     return false;
@@ -128,15 +129,30 @@ async fn is_valid_token(db: &Database, token: Option<String>) -> bool {
     }
 }
 
-async fn match_user_id(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<UserId>> {
-    let collection = db.collection::<UserId>("users");
+async fn match_user(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<User>> {
+    let collection = db.collection::<UserDocument>("users");
+
     let user_doc = collection.find_one(doc! {"_id":oid}, None).await?;
     if user_doc.is_none() {
         return Ok(None);
     }
+
     let unwrapped_doc = user_doc.unwrap();
-    let user_json = UserId {
-        _id: unwrapped_doc._id,
+    let user_json = User {
+        _id: unwrapped_doc._id.to_string(),
+        username: unwrapped_doc.username,
+        name: unwrapped_doc.name,
+        surname: unwrapped_doc.surname,
+        email: unwrapped_doc.email,
+        password: unwrapped_doc.password,
+        active: unwrapped_doc.active.to_string(),
+        passwordChangeAt: unwrapped_doc.passwordChangeAt.to_string(),
+        role: match unwrapped_doc.role {
+            UserRole::Admin => "Admin".to_string(),
+            UserRole::User => "User".to_string(),
+            UserRole::Superuser => "Superuser".to_string(),
+        },
     };
+
     Ok(Some(user_json))
 }

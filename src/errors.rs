@@ -29,10 +29,7 @@ impl IntoResponse for AppError {
             Self::UserDoesNotExist => (StatusCode::BAD_REQUEST, "User does not exist"),
             Self::WrongCredentials => (StatusCode::UNAUTHORIZED, "Wrong user credentials"),
             Self::UserAlreadyExists => (StatusCode::UNAUTHORIZED, "This user already exists"),
-            Self::NotAuthorized => (
-                StatusCode::UNAUTHORIZED,
-                "You are either logged out or not authorized to view this resource.",
-            ),
+            Self::NotAuthorized => (StatusCode::UNAUTHORIZED, "Login to access this resource"),
         };
         (
             status,
