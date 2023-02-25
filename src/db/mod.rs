@@ -1,13 +1,16 @@
-use crate::appstate::AppState;
 use mongodb::options::ClientOptions;
 use mongodb::{Client, Database};
 use std::env;
 
-pub async fn init_db() -> AppState {
-    match connect().await {
-        Ok(_database) => AppState { db: _database },
-        Err(_error) => panic!("Could not connect to database...{_error}"),
-    }
+pub async fn init_db() -> Database {
+    let db = match connect().await {
+        Ok(_database) => _database,
+        Err(_error) => {
+            eprintln!("Error connecting to database: {_error:?}");
+            panic!();
+        }
+    };
+    db
 }
 
 async fn connect() -> mongodb::error::Result<Database> {

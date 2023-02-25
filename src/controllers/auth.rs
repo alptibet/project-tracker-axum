@@ -1,9 +1,13 @@
 use crate::appstate::AppState;
 use crate::errors::AppError;
 use crate::models::auth::{AuthInfo, Claims};
-use crate::models::users::{User, UserDocument, UserRole};
-use axum::extract::State;
-use axum::{extract::TypedHeader, http::Request, middleware::Next, response::Response};
+use crate::models::users::{UserDocument, UserRole, ValidUser};
+use axum::{
+    extract::{State, TypedHeader},
+    http::Request,
+    middleware::Next,
+    response::Response,
+};
 use bcrypt::{verify, BcryptError};
 use chrono::Utc;
 use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
@@ -95,8 +99,8 @@ pub async fn authenticate_user<B>(
     } else {
         token = Some(cookies.unwrap().get("token").unwrap().to_string());
     } //Shall we do error handling here?
-    if is_valid_token(&state.db, token).await {
-        req.extensions_mut().insert(12);
+    if let Some(user) = is_valid_user(&state.db, token).await {
+        req.extensions_mut().insert(user);
         let response = next.run(req).await;
         Ok(response)
     } else {
@@ -104,7 +108,7 @@ pub async fn authenticate_user<B>(
     }
 }
 
-async fn is_valid_token(db: &Database, token: Option<String>) -> bool {
+async fn is_valid_user(db: &Database, token: Option<String>) -> Option<ValidUser> {
     let secret_key = env::var("JWT_SECRET").expect("No JWT KEY found in environment.");
     let payload = decode::<Claims>(
         token.unwrap().as_str(),
@@ -114,22 +118,20 @@ async fn is_valid_token(db: &Database, token: Option<String>) -> bool {
 
     if let Ok(_payload) = payload {
         let oid = ObjectId::parse_str(_payload.claims.sub).unwrap();
-        match match_user(db, oid).await {
+        let valid_user = match match_user(db, oid).await {
             Ok(_valid_user) => {
-                if _valid_user.is_none() {
-                    return false;
-                }
-                return true;
+                _valid_user.as_ref()?;
+                return _valid_user;
             }
-            Err(_err) => false,
+            Err(_err) => None,
         };
-        true
+        valid_user
     } else {
-        false
+        None
     }
 }
 
-async fn match_user(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<User>> {
+async fn match_user(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<ValidUser>> {
     let collection = db.collection::<UserDocument>("users");
 
     let user_doc = collection.find_one(doc! {"_id":oid}, None).await?;
@@ -138,15 +140,13 @@ async fn match_user(db: &Database, oid: ObjectId) -> mongodb::error::Result<Opti
     }
 
     let unwrapped_doc = user_doc.unwrap();
-    let user_json = User {
+    let user_json = ValidUser {
         _id: unwrapped_doc._id.to_string(),
         username: unwrapped_doc.username,
         name: unwrapped_doc.name,
         surname: unwrapped_doc.surname,
         email: unwrapped_doc.email,
-        password: unwrapped_doc.password,
         active: unwrapped_doc.active.to_string(),
-        passwordChangeAt: unwrapped_doc.passwordChangeAt.to_string(),
         role: match unwrapped_doc.role {
             UserRole::Admin => "Admin".to_string(),
             UserRole::User => "User".to_string(),

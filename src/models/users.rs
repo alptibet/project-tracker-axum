@@ -24,6 +24,18 @@ pub struct User {
 }
 
 #[allow(non_snake_case)]
+#[derive(Deserialize, Serialize, Clone)]
+pub struct ValidUser {
+    pub _id: String,
+    pub name: String,
+    pub surname: String,
+    pub username: String,
+    pub email: String,
+    pub active: String,
+    pub role: String,
+}
+
+#[allow(non_snake_case)]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UserDocument {
     pub _id: ObjectId,
@@ -36,7 +48,6 @@ pub struct UserDocument {
     pub passwordChangeAt: DateTime,
     pub role: UserRole,
 }
-
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize)]

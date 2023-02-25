@@ -1,9 +1,11 @@
-use crate::routes::create_routes;
+use crate::{appstate::AppState, db::init_db, routes::create_routes};
 
 pub async fn run_app() {
     let addr = std::net::SocketAddr::from(([0, 0, 0, 0], 3000));
     println!("Server started on {addr}");
-    let app = create_routes().await;
+    let db = init_db().await;
+    let appstate = AppState { db };
+    let app = create_routes(appstate).await;
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await

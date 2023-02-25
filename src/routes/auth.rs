@@ -4,11 +4,15 @@ use crate::controllers::users;
 use crate::errors::AppError;
 use crate::models::auth::{UserInput, UserLogin};
 use crate::models::response::MessageResponse;
+use crate::models::users::ValidUser;
+use axum::debug_handler;
 use axum::extract::{Json, State};
+use axum::http::StatusCode;
+use axum::Extension;
 use tower_cookies::Cookies;
 
 pub async fn signup(
-    state: State<AppState>,
+    State(state): State<AppState>,
     cookies: Cookies,
     input: Json<UserInput>,
 ) -> Result<Json<MessageResponse>, AppError> {
@@ -39,7 +43,7 @@ pub async fn signup(
 }
 
 pub async fn login(
-    state: State<AppState>,
+    State(state): State<AppState>,
     cookies: Cookies,
     input: Json<UserLogin>,
 ) -> Result<Json<MessageResponse>, AppError> {
