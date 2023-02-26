@@ -9,7 +9,10 @@ use self::{
     },
     users::{delete_user, get_all_users, get_one_user},
 };
-use crate::{appstate::AppState, controllers::auth::authenticate_user};
+use crate::{
+    appstate::AppState,
+    controllers::auth::{authenticate_user, authorize_admin},
+};
 use axum::{
     middleware,
     routing::{delete, get, patch, post},
@@ -30,6 +33,7 @@ pub async fn create_routes(appstate: AppState) -> Router {
         .route("/api/v1/users", get(get_all_users))
         .route("/api/v1/users/:id", get(get_one_user))
         .route("/api/v1/users", patch(delete_user))
+        .layer(middleware::from_fn(authorize_admin))
         .route("/api/v1/logout", post(logout))
         .route_layer(middleware::from_fn_with_state(
             appstate.clone(),

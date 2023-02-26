@@ -2,6 +2,7 @@ use crate::appstate::AppState;
 use crate::errors::AppError;
 use crate::models::auth::{AuthInfo, Claims};
 use crate::models::users::{UserDocument, UserRole, ValidUser};
+use axum::Extension;
 use axum::{
     extract::{State, TypedHeader},
     http::Request,
@@ -90,7 +91,7 @@ pub async fn authenticate_user<B>(
     let token: Option<String>;
     let auth_bearer = req.headers().get("authorization");
     if auth_bearer.is_none() && cookies.is_none() {
-        return Err(AppError::NotAuthorized);
+        return Err(AppError::NoAuth);
     }
 
     if let Some(_auth_bearer) = auth_bearer {
@@ -101,6 +102,19 @@ pub async fn authenticate_user<B>(
     } //Shall we do error handling here?
     if let Some(user) = is_valid_user(&state.db, token).await {
         req.extensions_mut().insert(user);
+        let response = next.run(req).await;
+        Ok(response)
+    } else {
+        Err(AppError::NoAuth)
+    }
+}
+
+pub async fn authorize_admin<B>(
+    Extension(user): Extension<ValidUser>,
+    req: Request<B>,
+    next: Next<B>,
+) -> Result<Response, AppError> {
+    if user.role == "Admin" {
         let response = next.run(req).await;
         Ok(response)
     } else {

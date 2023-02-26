@@ -7,6 +7,7 @@ use serde_json::json;
 
 #[derive(Debug)]
 pub enum AppError {
+    NoAuth,
     NotAuthorized,
     WrongCredentials,
     InternalServerError,
@@ -29,7 +30,11 @@ impl IntoResponse for AppError {
             Self::UserDoesNotExist => (StatusCode::BAD_REQUEST, "User does not exist"),
             Self::WrongCredentials => (StatusCode::UNAUTHORIZED, "Wrong user credentials"),
             Self::UserAlreadyExists => (StatusCode::UNAUTHORIZED, "This user already exists"),
-            Self::NotAuthorized => (StatusCode::UNAUTHORIZED, "Login to access this resource"),
+            Self::NoAuth => (StatusCode::UNAUTHORIZED, "Login to access this resource"),
+            Self::NotAuthorized => (
+                StatusCode::UNAUTHORIZED,
+                "You are not authorized to access this resource",
+            ),
         };
         (
             status,
