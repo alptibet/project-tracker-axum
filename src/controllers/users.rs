@@ -1,5 +1,5 @@
 use crate::models::auth::UserInput;
-use crate::models::users::{User, UserDocument, UserRole};
+use crate::models::users::{User, UserDocument, UserRole, UserUpdate};
 use axum::Json;
 use bcrypt::hash;
 use futures::TryStreamExt;
@@ -109,7 +109,11 @@ pub async fn insert_one(db: &Database, input: Json<UserInput>) -> mongodb::error
     Ok(user_json)
 }
 
-pub async fn deactivate_user(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<User>> {
+pub async fn update_one(
+    db: &Database,
+    oid: ObjectId,
+    input: Json<UserUpdate>,
+) -> mongodb::error::Result<Option<User>> {
     let collection = db.collection::<UserDocument>("users");
     let update_options = FindOneAndUpdateOptions::builder()
         .return_document(ReturnDocument::After)
@@ -117,14 +121,15 @@ pub async fn deactivate_user(db: &Database, oid: ObjectId) -> mongodb::error::Re
     let user_doc = collection
         .find_one_and_update(
             doc! {"_id":oid},
-            doc! {"$set": {"active": false}},
+            doc! {"$set":{"name": input.name.clone(), "active": input.active.clone()}},
             update_options,
         )
         .await?;
     if user_doc.is_none() {
         return Ok(None);
-    }
+    };
     let unwrapped_doc = user_doc.unwrap();
+    println!("{unwrapped_doc:?}");
     let user_json = User {
         _id: unwrapped_doc._id.to_string(),
         username: unwrapped_doc.username,

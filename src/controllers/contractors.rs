@@ -2,9 +2,9 @@ use axum::Json;
 use futures::TryStreamExt;
 use mongodb::bson::oid::ObjectId;
 use mongodb::bson::{doc, Document};
-use mongodb::Database;
 use mongodb::options::FindOneAndUpdateOptions;
 use mongodb::options::ReturnDocument;
+use mongodb::Database;
 
 use crate::models::contractors::{Contractor, ContractorDocument, ContractorInput};
 
@@ -68,7 +68,11 @@ pub async fn delete_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<
     Ok(Some("Document deleted".to_string()))
 }
 
-pub async fn update_one(db: &Database, oid: ObjectId, input: Json<ContractorInput>) -> mongodb::error::Result<Option<Contractor>> {
+pub async fn update_one(
+    db: &Database,
+    oid: ObjectId,
+    input: Json<ContractorInput>,
+) -> mongodb::error::Result<Option<Contractor>> {
     let collection = db.collection::<ContractorDocument>("contractors");
     let update_options = FindOneAndUpdateOptions::builder()
         .return_document(ReturnDocument::After)

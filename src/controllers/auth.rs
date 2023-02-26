@@ -112,19 +112,6 @@ pub async fn authenticate_user<B>(
     }
 }
 
-pub async fn authorize_admin<B>(
-    Extension(user): Extension<ValidUser>,
-    req: Request<B>,
-    next: Next<B>,
-) -> Result<Response, AppError> {
-    if user.role == "Admin" {
-        let response = next.run(req).await;
-        Ok(response)
-    } else {
-        Err(AppError::NotAuthorized)
-    }
-}
-
 async fn is_valid_user(db: &Database, token: Option<String>) -> Option<ValidUser> {
     let secret_key = env::var("JWT_SECRET").expect("No JWT KEY found in environment.");
     let payload = decode::<Claims>(
@@ -145,6 +132,19 @@ async fn is_valid_user(db: &Database, token: Option<String>) -> Option<ValidUser
         valid_user
     } else {
         None
+    }
+}
+
+pub async fn authorize_admin<B>(
+    Extension(user): Extension<ValidUser>,
+    req: Request<B>,
+    next: Next<B>,
+) -> Result<Response, AppError> {
+    if user.role == "Admin" {
+        let response = next.run(req).await;
+        Ok(response)
+    } else {
+        Err(AppError::NotAuthorized)
     }
 }
 

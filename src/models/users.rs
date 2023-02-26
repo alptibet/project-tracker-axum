@@ -23,10 +23,19 @@ pub struct User {
     pub role: String,
 }
 
-#[allow(non_snake_case)]
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ValidUser {
     pub _id: String,
+    pub name: String,
+    pub surname: String,
+    pub username: String,
+    pub email: String,
+    pub active: String,
+    pub role: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct UserUpdate {
     pub name: String,
     pub surname: String,
     pub username: String,
@@ -49,7 +58,6 @@ pub struct UserDocument {
     pub role: UserRole,
 }
 
-#[allow(non_snake_case)]
 #[derive(Deserialize, Serialize)]
 pub struct UserId {
     pub _id: String,

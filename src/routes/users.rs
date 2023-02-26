@@ -1,8 +1,8 @@
 use crate::appstate::AppState;
 use crate::controllers::users;
 use crate::errors::AppError;
-use crate::models::response::{DocResponse, MessageResponse, VecResponse};
-use crate::models::users::{User, UserId};
+use crate::models::response::{DocResponse, VecResponse};
+use crate::models::users::{User, UserUpdate};
 use axum::extract::{Json, Path, State};
 use mongodb::bson::oid::ObjectId;
 
@@ -40,21 +40,23 @@ pub async fn get_one_user(
     }
 }
 
-pub async fn delete_user(
+pub async fn update_user(
+    Path(_id): Path<String>,
     State(state): State<AppState>,
-    input: Json<UserId>,
-) -> Result<Json<MessageResponse>, AppError> {
-    let oid = ObjectId::parse_str(input._id.clone());
+    input: Json<UserUpdate>,
+) -> Result<Json<DocResponse<User>>, AppError> {
+    let oid = ObjectId::parse_str(_id);
     if oid.is_err() {
         return Err(AppError::OidParseError);
     }
-    match users::deactivate_user(&state.db, oid.unwrap()).await {
+    match users::update_one(&state.db, oid.unwrap(), input).await {
         Ok(_user_doc) => {
             if _user_doc.is_none() {
                 return Err(AppError::NotFound);
             }
-            Ok(Json(MessageResponse {
-                message: "Success".to_string(),
+            Ok(Json(DocResponse {
+                message: "success".to_string(),
+                data: _user_doc.unwrap(),
             }))
         }
         Err(_error) => Err(AppError::BadRequest),
