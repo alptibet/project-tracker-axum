@@ -1,5 +1,6 @@
 mod auth;
 mod contractors;
+mod cookie;
 mod users;
 use self::{
     auth::{login, logout, signup},
@@ -7,6 +8,7 @@ use self::{
         delete_contractor, get_all_contractors, get_one_contractor, insert_contractor,
         update_contractor,
     },
+    cookie::deneme,
     users::{delete_user, get_all_users, get_one_user},
 };
 use crate::{
@@ -41,6 +43,7 @@ pub async fn create_routes(appstate: AppState) -> Router {
         ))
         .route("/api/v1/signup", post(signup))
         .route("/api/v1/login", post(login))
+        .route("/api/v1/cookie", get(deneme))
         .with_state(appstate)
         .layer(CookieManagerLayer::new())
         .layer(TraceLayer::new_for_http())

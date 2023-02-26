@@ -34,9 +34,9 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<User>> {
             password,
             passwordChangeAt: password_change_at.to_string(),
             role: match userrole {
-                UserRole::Admin => "admin".to_string(),
-                UserRole::User => "user".to_string(),
-                UserRole::Superuser => "superuser".to_string(),
+                UserRole::Admin => "Admin".to_string(),
+                UserRole::User => "User".to_string(),
+                UserRole::Superuser => "Superuser".to_string(),
             },
         };
         users.push(user_json);

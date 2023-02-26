@@ -5,6 +5,7 @@ use crate::models::users::{UserDocument, UserRole, ValidUser};
 use axum::Extension;
 use axum::{
     extract::{State, TypedHeader},
+    headers,
     http::Request,
     middleware::Next,
     response::Response,
