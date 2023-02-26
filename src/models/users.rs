@@ -17,7 +17,7 @@ pub struct User {
     pub surname: String,
     pub username: String,
     pub email: String,
-    pub active: String,
+    pub active: bool,
     pub password: String,
     pub passwordChangeAt: String,
     pub role: String,
@@ -40,7 +40,7 @@ pub struct UserUpdate {
     pub surname: String,
     pub username: String,
     pub email: String,
-    pub active: String,
+    pub active: bool,
     pub role: String,
 }
 

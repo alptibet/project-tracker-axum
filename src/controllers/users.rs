@@ -30,7 +30,7 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<User>> {
             surname,
             username,
             email,
-            active: active.to_string(),
+            active,
             password,
             passwordChangeAt: password_change_at.to_string(),
             role: match userrole {
@@ -60,7 +60,7 @@ pub async fn find_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Op
         surname: unwrapped_doc.surname,
         email: unwrapped_doc.email,
         password: unwrapped_doc.password,
-        active: unwrapped_doc.active.to_string(),
+        active: unwrapped_doc.active,
         passwordChangeAt: unwrapped_doc.passwordChangeAt.to_string(),
         role: match unwrapped_doc.role {
             UserRole::Admin => "Admin".to_string(),
@@ -101,7 +101,7 @@ pub async fn insert_one(db: &Database, input: Json<UserInput>) -> mongodb::error
         surname: surname.to_string(),
         username: username.to_string(),
         email: email.to_string(),
-        active: active.to_string(),
+        active,
         password,
         passwordChangeAt: password_created_at.to_string(),
         role,
@@ -121,7 +121,7 @@ pub async fn update_one(
     let user_doc = collection
         .find_one_and_update(
             doc! {"_id":oid},
-            doc! {"$set":{"name": input.name.clone(), "active": input.active.clone()}},
+            doc! {"$set":{"name": input.name.clone(), "surname":input.surname.clone(),"username": input.username.clone(),"email":input.email.clone(), "active": input.active, "role":input.role.clone()}},
             update_options,
         )
         .await?;
@@ -137,7 +137,7 @@ pub async fn update_one(
         surname: unwrapped_doc.surname,
         email: unwrapped_doc.email,
         password: unwrapped_doc.password,
-        active: unwrapped_doc.active.to_string(),
+        active: unwrapped_doc.active,
         passwordChangeAt: unwrapped_doc.passwordChangeAt.to_string(),
         role: match unwrapped_doc.role {
             UserRole::Admin => "Admin".to_string(),
