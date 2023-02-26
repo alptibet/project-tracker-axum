@@ -4,11 +4,7 @@ use crate::controllers::users;
 use crate::errors::AppError;
 use crate::models::auth::{UserInput, UserLogin};
 use crate::models::response::MessageResponse;
-use crate::models::users::ValidUser;
-use axum::debug_handler;
 use axum::extract::{Json, State};
-use axum::http::StatusCode;
-use axum::Extension;
 use tower_cookies::Cookies;
 
 pub async fn signup(

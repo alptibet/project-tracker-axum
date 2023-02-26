@@ -1,6 +1,6 @@
 use mongodb::Database;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct AppState {
     pub db: Database,
 }
