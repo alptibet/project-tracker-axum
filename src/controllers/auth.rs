@@ -24,10 +24,12 @@ use tower_cookies::{
 };
 
 pub fn create_send_token<'a>(_id: &str) -> Cookie<'a> {
+    let exp = OffsetDateTime::now_utc() + Duration::hours(1);
     Cookie::build("token", sign_token(_id))
         .path("/")
         .secure(false)
         .http_only(true)
+        .expires(exp)
         .finish()
 }
 

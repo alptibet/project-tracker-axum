@@ -34,11 +34,11 @@ pub async fn create_routes(appstate: AppState) -> Router {
         .route("/api/v1/users/:id", get(get_one_user))
         .route("/api/v1/users", patch(delete_user))
         .layer(middleware::from_fn(authorize_admin))
-        .route("/api/v1/logout", post(logout))
         .route_layer(middleware::from_fn_with_state(
             appstate.clone(),
             authenticate_user,
         ))
+        .route("/api/v1/logout", post(logout))
         .route("/api/v1/signup", post(signup))
         .route("/api/v1/login", post(login))
         .with_state(appstate)
