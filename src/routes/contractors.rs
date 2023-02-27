@@ -42,9 +42,9 @@ pub async fn get_one_contractor(
 
 pub async fn insert_contractor(
     State(state): State<AppState>,
-    input: Json<ContractorInput>,
+    input: ContractorInput,
 ) -> Result<Json<DocResponse<Contractor>>, AppError> {
-    match contractors::insert_one(&state.db, input).await {
+    match contractors::insert_one(&state.db, Json(input)).await {
         Ok(_contractor_doc) => Ok(Json(DocResponse {
             message: "Success".to_string(),
             data: _contractor_doc,
@@ -83,13 +83,13 @@ pub async fn delete_contractor(
 pub async fn update_contractor(
     Path(_id): Path<String>,
     State(state): State<AppState>,
-    input: Json<ContractorInput>,
+    input: ContractorInput,
 ) -> Result<Json<DocResponse<Contractor>>, AppError> {
     let oid = ObjectId::parse_str(_id);
     if oid.is_err() {
         return Err(AppError::OidParseError);
     }
-    match contractors::update_one(&state.db, oid.unwrap(), input).await {
+    match contractors::update_one(&state.db, oid.unwrap(), Json(input)).await {
         Ok(_contractor_doc) => {
             if _contractor_doc.is_none() {
                 return Err(AppError::NotFound);
