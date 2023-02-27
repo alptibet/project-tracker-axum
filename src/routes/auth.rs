@@ -10,9 +10,9 @@ use tower_cookies::Cookies;
 pub async fn signup(
     State(state): State<AppState>,
     cookies: Cookies,
-    input: Json<UserInput>,
+    input: UserInput,
 ) -> Result<Json<MessageResponse>, AppError> {
-    match users::insert_one(&state.db, input).await {
+    match users::insert_one(&state.db, Json(input)).await {
         Ok(_user_doc) => {
             match auth::match_auth(&state.db, &_user_doc.username).await {
                 Ok(_auth_info) => {
@@ -41,7 +41,7 @@ pub async fn signup(
 pub async fn login(
     State(state): State<AppState>,
     cookies: Cookies,
-    input: Json<UserLogin>,
+    Json(input): Json<UserLogin>,
 ) -> Result<Json<MessageResponse>, AppError> {
     let match_auth = match auth::match_auth(&state.db, &input.username).await {
         Ok(_match_auth) => {

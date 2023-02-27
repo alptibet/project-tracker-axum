@@ -3,9 +3,10 @@ use axum::{
     response::{IntoResponse, Response},
     Json,
 };
+use serde::Serialize;
 use serde_json::json;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum AppError {
     NoAuth,
     NotAuthorized,

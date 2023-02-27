@@ -43,13 +43,13 @@ pub async fn get_one_user(
 pub async fn update_user(
     Path(_id): Path<String>,
     State(state): State<AppState>,
-    input: Json<UserUpdate>,
+    input: UserUpdate,
 ) -> Result<Json<DocResponse<User>>, AppError> {
     let oid = ObjectId::parse_str(_id);
     if oid.is_err() {
         return Err(AppError::OidParseError);
     }
-    match users::update_one(&state.db, oid.unwrap(), input).await {
+    match users::update_one(&state.db, oid.unwrap(), Json(input)).await {
         Ok(_user_doc) => {
             if _user_doc.is_none() {
                 return Err(AppError::NotFound);
