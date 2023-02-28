@@ -1,5 +1,5 @@
 use crate::models::auth::UserInput;
-use crate::models::users::{User, UserDocument, UserRole, UserUpdate};
+use crate::models::users::{Me, User, UserDocument, UserRole, UserUpdate};
 use axum::Json;
 use bcrypt::hash;
 use futures::TryStreamExt;
@@ -144,6 +144,25 @@ pub async fn update_one(
             UserRole::User => "User".to_string(),
             UserRole::Superuser => "Superuser".to_string(),
         },
+    };
+
+    Ok(Some(user_json))
+}
+
+pub async fn get_me(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<Me>> {
+    let collection = db.collection::<Me>("users");
+    let user_doc = collection.find_one(doc! {"_id": oid}, None).await?;
+
+    if user_doc.is_none() {
+        return Ok(None);
+    }
+
+    let unwrapped_doc = user_doc.unwrap();
+    let user_json = Me {
+        username: unwrapped_doc.username,
+        name: unwrapped_doc.name,
+        surname: unwrapped_doc.surname,
+        email: unwrapped_doc.email,
     };
 
     Ok(Some(user_json))

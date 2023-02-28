@@ -44,6 +44,14 @@ pub struct ValidUser {
     pub role: String,
 }
 
+#[derive(Deserialize, Serialize)]
+pub struct Me {
+    pub name: String,
+    pub surname: String,
+    pub username: String,
+    pub email: String,
+}
+
 #[allow(non_snake_case)]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UserDocument {
