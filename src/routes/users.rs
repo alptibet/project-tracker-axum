@@ -3,9 +3,9 @@ use crate::controllers::users;
 use crate::errors::AppError;
 use crate::models::response::{DocResponse, VecResponse};
 use crate::models::users::{Me, User, UserUpdate, ValidUser};
+use crate::utils::parse_oid;
 use axum::extract::{Json, Path, State};
 use axum::Extension;
-use mongodb::bson::oid::ObjectId;
 
 pub async fn get_all_users(
     State(state): State<AppState>,
@@ -23,11 +23,8 @@ pub async fn get_one_user(
     Path(_id): Path<String>,
     State(state): State<AppState>,
 ) -> Result<Json<DocResponse<User>>, AppError> {
-    let oid = ObjectId::parse_str(_id);
-    if oid.is_err() {
-        return Err(AppError::OidParseError);
-    }
-    match users::find_one(&state.db, oid.unwrap()).await {
+    let oid = parse_oid(_id)?;
+    match users::find_one(&state.db, oid).await {
         Ok(_user_doc) => {
             if _user_doc.is_none() {
                 return Err(AppError::NotFound);
@@ -46,11 +43,8 @@ pub async fn update_user(
     State(state): State<AppState>,
     input: UserUpdate,
 ) -> Result<Json<DocResponse<User>>, AppError> {
-    let oid = ObjectId::parse_str(_id);
-    if oid.is_err() {
-        return Err(AppError::OidParseError);
-    }
-    match users::update_one(&state.db, oid.unwrap(), Json(input)).await {
+    let oid = parse_oid(_id)?;
+    match users::update_one(&state.db, oid, Json(input)).await {
         Ok(_user_doc) => {
             if _user_doc.is_none() {
                 return Err(AppError::NotFound);
@@ -68,11 +62,8 @@ pub async fn get_me(
     State(state): State<AppState>,
     Extension(user): Extension<ValidUser>,
 ) -> Result<Json<DocResponse<Me>>, AppError> {
-    let oid = ObjectId::parse_str(user._id);
-    if oid.is_err() {
-        return Err(AppError::OidParseError);
-    }
-    match users::get_me(&state.db, oid.unwrap()).await {
+    let oid = parse_oid(user._id)?;
+    match users::get_me(&state.db, oid).await {
         Ok(_user_doc) => {
             if _user_doc.is_none() {
                 return Err(AppError::BadRequest); //Change this with something like it is not you
