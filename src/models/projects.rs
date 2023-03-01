@@ -1,7 +1,5 @@
-use mongodb::bson::{oid::ObjectId, DateTime};
+use mongodb::bson::{oid::ObjectId, DateTime, Document};
 use serde::{Deserialize, Serialize};
-
-use super::{contractors::Contractor, systems::System};
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize)]
@@ -13,7 +11,7 @@ pub struct ProjectDocument {
     pub completed: bool,
     pub duration: i32,
     pub startDate: DateTime,
-    pub contractor: ObjectId,
+    pub contractor: Vec<Document>,
 }
 
 #[allow(non_snake_case)]
@@ -26,5 +24,6 @@ pub struct Project {
     pub completed: bool,
     pub duration: i32,
     pub startDate: String,
+    #[serde(default, rename = "contractor")]
     pub contractor: String,
 }

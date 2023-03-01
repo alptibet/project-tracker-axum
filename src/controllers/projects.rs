@@ -51,9 +51,8 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
     let mut projects: Vec<Project> = vec![];
 
     while let Some(result) = results.next().await {
-        dbg!(&result);
-        let doc: Project = bson::from_document(result?)?;
-        dbg!(&doc);
+        let doc: ProjectDocument = bson::from_document(result?)?;
+
         let projects_json = Project {
             _id: doc._id.to_string(),
             name: doc.name,
@@ -62,11 +61,10 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
             completed: doc.completed,
             duration: doc.duration,
             startDate: doc.startDate.to_string(),
-            contractor: doc.contractor.to_string(),
+            contractor: doc.contractor[0].get_str("name").unwrap_or("").to_string(),
         };
 
         projects.push(projects_json);
-        dbg!(&projects);
     }
     Ok(projects)
 }
