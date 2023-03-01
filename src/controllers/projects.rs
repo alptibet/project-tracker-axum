@@ -6,37 +6,6 @@ use mongodb::{
 
 use crate::models::projects::{Project, ProjectDocument};
 
-// pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
-//     let collection = db.collection::<ProjectDocument>("projects");
-//     let mut cursor = collection.find(None, None).await?;
-//     let mut projects: Vec<Project> = vec![];
-
-//     while let Some(result) = cursor.try_next().await? {
-//         let _id = result._id;
-//         let name = result.name;
-//         let address = result.address;
-//         let active = result.active;
-//         let completed = result.completed;
-//         let duration = result.duration;
-//         let startdate = result.startDate;
-//         let contractor = result.contractor;
-//         // let systems = result.systems;
-
-//         let projects_json = Project {
-//             _id: _id.to_string(),
-//             name,
-//             address,
-//             active,
-//             completed,
-//             duration,
-//             startDate: startdate.to_string(),
-//             contractor: contractor.try_into(),
-//             // systems,
-//         };
-//         projects.push(projects_json);
-//     }
-//     Ok(projects)
-// }
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
     let collection = db.collection::<ProjectDocument>("projects");
     let stage_lookup_contractor = doc! {"$lookup":{
