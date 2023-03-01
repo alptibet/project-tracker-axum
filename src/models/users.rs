@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use validator::Validate;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Deserialize, Serialize)]
 pub enum UserRole {
     User,
     Admin,
@@ -34,7 +34,7 @@ pub struct User {
 }
 
 #[allow(non_snake_case)]
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct UserDocument {
     pub _id: ObjectId,
     pub name: String,
@@ -46,7 +46,7 @@ pub struct UserDocument {
     pub passwordChangeAt: DateTime,
     pub role: UserRole,
 }
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct ValidUser {
     pub _id: String,
     pub name: String,
