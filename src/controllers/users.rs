@@ -118,18 +118,18 @@ pub async fn update_one(
     let update_options = FindOneAndUpdateOptions::builder()
         .return_document(ReturnDocument::After)
         .build();
+
     let user_doc = collection
         .find_one_and_update(
             doc! {"_id":oid},
             doc! {"$set":{"name": input.name.clone(), "surname":input.surname.clone(),"username": input.username.clone(),"email":input.email.clone(), "active": input.active, "role":input.role.clone()}},
-            update_options,
+            update_options
         )
         .await?;
     if user_doc.is_none() {
         return Ok(None);
     };
     let unwrapped_doc = user_doc.unwrap();
-    println!("{unwrapped_doc:?}");
     let user_json = User {
         _id: unwrapped_doc._id.to_string(),
         username: unwrapped_doc.username,
@@ -163,6 +163,35 @@ pub async fn get_me(db: &Database, oid: ObjectId) -> mongodb::error::Result<Opti
         name: unwrapped_doc.name,
         surname: unwrapped_doc.surname,
         email: unwrapped_doc.email,
+        active: unwrapped_doc.active,
+    };
+
+    Ok(Some(user_json))
+}
+pub async fn update_me(
+    db: &Database,
+    input: Json<Me>,
+    oid: ObjectId,
+) -> mongodb::error::Result<Option<Me>> {
+    let collection = db.collection::<UserDocument>("users");
+    let update_options = FindOneAndUpdateOptions::builder()
+        .return_document(ReturnDocument::After)
+        .build();
+
+    let user_doc = collection.find_one_and_update(doc!
+        {"_id":oid}, doc! {"$set":{"name": input.name.clone(), "surname":input.surname.clone(),"email":input.email.clone(),"active": input.active}}, update_options).await?;
+
+    if user_doc.is_none() {
+        return Ok(None);
+    }
+
+    let unwrapped_doc = user_doc.unwrap();
+    let user_json = Me {
+        username: unwrapped_doc.username,
+        name: unwrapped_doc.name,
+        surname: unwrapped_doc.surname,
+        email: unwrapped_doc.email,
+        active: unwrapped_doc.active,
     };
 
     Ok(Some(user_json))

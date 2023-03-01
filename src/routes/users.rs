@@ -66,7 +66,27 @@ pub async fn get_me(
     match users::get_me(&state.db, oid).await {
         Ok(_user_doc) => {
             if _user_doc.is_none() {
-                return Err(AppError::BadRequest); //Change this with something like it is not you
+                return Err(AppError::NotFound);
+            }
+            Ok(Json(DocResponse {
+                message: "success".to_string(),
+                data: _user_doc.unwrap(),
+            }))
+        }
+        Err(_error) => Err(AppError::BadRequest),
+    }
+}
+
+pub async fn update_me(
+    State(state): State<AppState>,
+    Extension(user): Extension<ValidUser>,
+    input: Me,
+) -> Result<Json<DocResponse<Me>>, AppError> {
+    let oid = parse_oid(user._id.clone())?;
+    match users::update_me(&state.db, Json(input), oid).await {
+        Ok(_user_doc) => {
+            if _user_doc.is_none() {
+                return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
                 message: "success".to_string(),

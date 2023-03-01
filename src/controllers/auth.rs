@@ -2,6 +2,7 @@ use crate::appstate::AppState;
 use crate::errors::AppError;
 use crate::models::auth::{AuthInfo, Claims};
 use crate::models::users::{UserDocument, UserRole, ValidUser};
+use crate::utils::parse_oid;
 use axum::Extension;
 use axum::{
     extract::{State, TypedHeader},
@@ -104,6 +105,9 @@ pub async fn authenticate_user<B>(
         token = Some(cookies.unwrap().get("token").unwrap().to_string());
     } //Shall we do error handling here?
     if let Some(user) = is_valid_user(&state.db, token).await {
+        if !user.active {
+            return Err(AppError::UserNotActive);
+        }
         req.extensions_mut().insert(user);
         let response = next.run(req).await;
         Ok(response)
@@ -121,7 +125,7 @@ async fn is_valid_user(db: &Database, token: Option<String>) -> Option<ValidUser
     );
 
     if let Ok(_payload) = payload {
-        let oid = ObjectId::parse_str(_payload.claims.sub).unwrap();
+        let oid = parse_oid(_payload.claims.sub).unwrap();
         let valid_user = match match_user(db, oid).await {
             Ok(_valid_user) => {
                 _valid_user.as_ref()?;
@@ -132,19 +136,6 @@ async fn is_valid_user(db: &Database, token: Option<String>) -> Option<ValidUser
         valid_user
     } else {
         None
-    }
-}
-
-pub async fn authorize_admin<B>(
-    Extension(user): Extension<ValidUser>,
-    req: Request<B>,
-    next: Next<B>,
-) -> Result<Response, AppError> {
-    if user.role == "Admin" {
-        let response = next.run(req).await;
-        Ok(response)
-    } else {
-        Err(AppError::NotAuthorized)
     }
 }
 
@@ -163,7 +154,7 @@ async fn match_user(db: &Database, oid: ObjectId) -> mongodb::error::Result<Opti
         name: unwrapped_doc.name,
         surname: unwrapped_doc.surname,
         email: unwrapped_doc.email,
-        active: unwrapped_doc.active.to_string(),
+        active: unwrapped_doc.active,
         role: match unwrapped_doc.role {
             UserRole::Admin => "Admin".to_string(),
             UserRole::User => "User".to_string(),
@@ -172,4 +163,17 @@ async fn match_user(db: &Database, oid: ObjectId) -> mongodb::error::Result<Opti
     };
 
     Ok(Some(user_json))
+}
+
+pub async fn authorize_admin<B>(
+    Extension(user): Extension<ValidUser>,
+    req: Request<B>,
+    next: Next<B>,
+) -> Result<Response, AppError> {
+    if user.role == "Admin" {
+        let response = next.run(req).await;
+        Ok(response)
+    } else {
+        Err(AppError::NotAuthorized)
+    }
 }
