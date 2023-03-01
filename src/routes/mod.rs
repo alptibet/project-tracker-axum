@@ -31,7 +31,8 @@ pub async fn create_routes(appstate: AppState) -> Router {
         .route("/api/v1/contractors/:id", delete(delete_contractor))
         .route("/api/v1/contractors/:id", patch(update_contractor))
         .route("/api/v1/users", get(get_all_users))
-        .route("/api/v1/users/:id", get(get_one_user).patch(update_user))
+        .route("/api/v1/users/:id", get(get_one_user))
+        .route("/api/v1/users/:id", patch(update_user))
         .layer(middleware::from_fn(authorize_admin))
         .route("/api/v1/users/me", get(get_me).patch(update_me))
         .route_layer(middleware::from_fn_with_state(

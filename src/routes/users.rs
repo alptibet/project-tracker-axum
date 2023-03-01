@@ -54,7 +54,16 @@ pub async fn update_user(
                 data: _user_doc.unwrap(),
             }))
         }
-        Err(_error) => Err(AppError::BadRequest),
+        Err(_error) => {
+            let error = _error.kind.to_string();
+            if error.contains("username_1") {
+                return Err(AppError::UserAlreadyExists);
+            }
+            if error.contains("email_1") {
+                return Err(AppError::EmailAlreadyExists);
+            }
+            Err(AppError::BadRequest)
+        }
     }
 }
 
@@ -93,6 +102,15 @@ pub async fn update_me(
                 data: _user_doc.unwrap(),
             }))
         }
-        Err(_error) => Err(AppError::BadRequest),
+        Err(_error) => {
+            let error = _error.kind.to_string();
+            if error.contains("username_1") {
+                return Err(AppError::UserAlreadyExists);
+            }
+            if error.contains("email_1") {
+                return Err(AppError::EmailAlreadyExists);
+            }
+            Err(AppError::BadRequest)
+        }
     }
 }

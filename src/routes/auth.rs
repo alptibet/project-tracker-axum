@@ -29,11 +29,14 @@ pub async fn signup(
             }))
         }
         Err(_error) => {
-            let res = _error.to_string();
-            if res.contains("code: 11000") {
+            let error = _error.kind.to_string();
+            if error.contains("username_1") {
                 return Err(AppError::UserAlreadyExists);
             }
-            Err(AppError::InternalServerError)
+            if error.contains("email_1") {
+                return Err(AppError::EmailAlreadyExists);
+            }
+            Err(AppError::BadRequest)
         }
     }
 }
@@ -64,7 +67,7 @@ pub async fn login(
                 Err(AppError::WrongCredentials)
             }
         }
-        Err(_error) => Err(AppError::InternalServerError),
+        Err(_error) => Err(AppError::BadRequest),
     }
 }
 

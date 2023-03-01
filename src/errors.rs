@@ -14,6 +14,7 @@ pub enum AppError {
     InternalServerError,
     UserDoesNotExist,
     UserAlreadyExists,
+    EmailAlreadyExists,
     UserNotActive,
     DuplicateRecord,
     BadRequest,
@@ -32,7 +33,11 @@ impl IntoResponse for AppError {
             Self::UserDoesNotExist => (StatusCode::BAD_REQUEST, "User does not exist"),
             Self::UserNotActive => (StatusCode::FORBIDDEN, "Your account is not active"),
             Self::WrongCredentials => (StatusCode::UNAUTHORIZED, "Wrong user credentials"),
-            Self::UserAlreadyExists => (StatusCode::UNAUTHORIZED, "This user already exists"),
+            Self::UserAlreadyExists => (StatusCode::BAD_REQUEST, "This username is already taken"),
+            Self::EmailAlreadyExists => (
+                StatusCode::BAD_REQUEST,
+                "This email address belongs to another user.",
+            ),
             Self::NoAuth => (StatusCode::UNAUTHORIZED, "Login to access this resource"),
             Self::NotAuthorized => (
                 StatusCode::UNAUTHORIZED,
