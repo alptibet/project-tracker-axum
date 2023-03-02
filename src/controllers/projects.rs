@@ -8,20 +8,31 @@ use crate::models::projects::{Project, ProjectDocument};
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
     let collection = db.collection::<ProjectDocument>("projects");
-    let stage_lookup_contractor = doc! {"$lookup":{
-        "from":"contractors",
-        "localField": "contractor",
-        "foreignField":"_id",
-        "as": "contractor"
-    }};
-    let pipeline = vec![stage_lookup_contractor];
+    let stage_lookup_contractor = vec![
+        doc! {
+        "$lookup":{
+            "from":"contractors",
+            "localField": "contractor",
+            "foreignField":"_id",
+            "as": "contractor"
+        }},
+        doc! {
+        "$lookup":{
+            "from":"systems",
+            "localField": "systems",
+            "foreignField":"_id",
+            "as": "systems"
+        }},
+    ];
+
+    let pipeline = stage_lookup_contractor;
     let mut results = collection.aggregate(pipeline, None).await?;
 
     let mut projects: Vec<Project> = vec![];
 
     while let Some(result) = results.next().await {
+        dbg!(&result);
         let doc: ProjectDocument = bson::from_document(result?)?;
-
         let projects_json = Project {
             _id: doc._id.to_string(),
             name: doc.name,
@@ -30,10 +41,13 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
             completed: doc.completed,
             duration: doc.duration,
             startDate: doc.startDate.to_string(),
+            completionDate: doc.completionDate.to_string(),
             contractor: doc.contractor[0].get_str("name").unwrap_or("").to_string(),
+            systems: doc.systems[0].get_str("name").unwrap_or("").to_string(),
         };
 
         projects.push(projects_json);
     }
+
     Ok(projects)
 }

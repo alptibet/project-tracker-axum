@@ -11,7 +11,9 @@ pub struct ProjectDocument {
     pub completed: bool,
     pub duration: i32,
     pub startDate: DateTime,
+    pub completionDate: DateTime,
     pub contractor: Vec<Document>,
+    pub systems: Vec<Document>,
 }
 
 #[allow(non_snake_case)]
@@ -24,6 +26,7 @@ pub struct Project {
     pub completed: bool,
     pub duration: i32,
     pub startDate: String,
-    #[serde(default, rename = "contractor")]
+    pub completionDate: String,
     pub contractor: String,
+    pub systems: String,
 }

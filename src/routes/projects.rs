@@ -12,6 +12,6 @@ pub async fn get_all_projects(
             message: "Success".to_string(),
             data: _projects_doc,
         })),
-        Err(_error) => Err(AppError::DuplicateRecord),
+        Err(_error) => Err(AppError::BadRequest),
     }
 }
