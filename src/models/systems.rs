@@ -1,32 +1,38 @@
-use mongodb::bson::oid::ObjectId;
+use mongodb::bson::{oid::ObjectId, Document};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
 pub struct Systems {
-    systems: Vec<SysWithScope>,
+    pub systems: Vec<SysWithScope>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct SystemDocument {
-    _id: ObjectId,
-    name: String,
+    pub _id: ObjectId,
+    pub name: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct System {
-    _id: String,
-    name: String,
+    pub _id: String,
+    pub name: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub enum Scope {
     Design,
     Installation,
     Commissioning,
 }
 
-#[derive(Deserialize, Serialize)]
-struct SysWithScope {
-    system: System,
-    scope: Scope,
+#[derive(Deserialize, Serialize, Debug)]
+pub struct SysWithScope {
+    pub system: SystemDocument,
+    pub scope: Scope,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct SysWithScope2 {
+    pub system: Document,
+    pub scope: String,
 }

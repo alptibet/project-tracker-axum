@@ -4,29 +4,56 @@ use mongodb::{
     Database,
 };
 
-use crate::models::projects::{Project, ProjectDocument};
+use crate::models::{projects::{Project, ProjectDocument}, systems::{SysWithScope, System, SysWithScope2}};
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
     let collection = db.collection::<ProjectDocument>("projects");
-    let stage_lookup_contractor = vec![
-        doc! {
+    let stage_lookup = vec![
+        doc!{"$unwind": {"path":"$systems"}},
+        doc!{
+            "$lookup":{
+                "from":"systems",
+                "localField": "systems.system",
+                "foreignField":"_id",
+                "as": "systems.system"
+            },
+        },
+        doc!{"$unwind": {"path":"$systems.system"}},
+        doc!{"$group": 
+            {
+            "_id":"$_id",
+            "systems": {
+                "$push":"$systems"
+            }
+        }},
+        doc!{
+            "$lookup":{
+                "from":"projects",
+                "localField": "_id",
+                "foreignField":"_id",
+                "as": "projectDetails"
+            },
+        },
+        doc!{"$unwind": {"path":"$projectDetails"}},
+        doc!{"$addFields": {
+            "projectDetails.systems":"$systems"
+        }},
+        doc!{
+        "$replaceRoot": {
+            "newRoot": "$projectDetails"
+            }
+        },
+        doc!{
         "$lookup":{
             "from":"contractors",
             "localField": "contractor",
             "foreignField":"_id",
             "as": "contractor"
         }},
-        doc! {
-            "$lookup":{
-                "from":"systems",
-                "localField": "systems",
-                "foreignField":"_id",
-                "as": "systems"
-            },
-        },
+        doc!{"$unwind": {"path":"$contractor"}},
     ];
 
-    let pipeline = stage_lookup_contractor;
+    let pipeline = stage_lookup;
     let mut results = collection.aggregate(pipeline, None).await?;
 
     let mut projects: Vec<Project> = vec![];
@@ -34,9 +61,17 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
     while let Some(result) = results.next().await {
         dbg!(&result);
         let doc: ProjectDocument = bson::from_document(result?)?;
-        let mut systems: Vec<String> = vec![];
+        dbg!(&doc);
+        let mut systems: Vec<SysWithScope2> = vec![];
         for system in doc.systems {
-            systems.push(system.get_str("name").unwrap_or("No Name").to_string());
+            dbg!(system);
+            // systems.push(SysWithScope{
+            //     system: System {
+            //         _id: system._id,
+            //         name: system.name
+            //     },
+            //     scope: system.scope.to_string()
+            // });
         }
 
         let projects_json = Project {
@@ -52,7 +87,7 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
                 .get_str("name")
                 .unwrap_or("No Name")
                 .to_string(),
-            systems,
+            systems: vec!["DENEME".to_string()]
         };
 
         projects.push(projects_json);
