@@ -17,12 +17,13 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
             "as": "contractor"
         }},
         doc! {
-        "$lookup":{
-            "from":"systems",
-            "localField": "systems",
-            "foreignField":"_id",
-            "as": "systems"
-        }},
+            "$lookup":{
+                "from":"systems",
+                "localField": "systems",
+                "foreignField":"_id",
+                "as": "systems"
+            },
+        },
     ];
 
     let pipeline = stage_lookup_contractor;
@@ -33,6 +34,11 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
     while let Some(result) = results.next().await {
         dbg!(&result);
         let doc: ProjectDocument = bson::from_document(result?)?;
+        let mut systems: Vec<String> = vec![];
+        for system in doc.systems {
+            systems.push(system.get_str("name").unwrap_or("No Name").to_string());
+        }
+
         let projects_json = Project {
             _id: doc._id.to_string(),
             name: doc.name,
@@ -42,8 +48,11 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
             duration: doc.duration,
             startDate: doc.startDate.to_string(),
             completionDate: doc.completionDate.to_string(),
-            contractor: doc.contractor[0].get_str("name").unwrap_or("").to_string(),
-            systems: doc.systems[0].get_str("name").unwrap_or("").to_string(),
+            contractor: doc.contractor[0]
+                .get_str("name")
+                .unwrap_or("No Name")
+                .to_string(),
+            systems,
         };
 
         projects.push(projects_json);

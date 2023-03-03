@@ -28,5 +28,5 @@ pub struct Project {
     pub startDate: String,
     pub completionDate: String,
     pub contractor: String,
-    pub systems: String,
+    pub systems: Vec<String>,
 }
