@@ -4,13 +4,16 @@ use mongodb::{
     Database,
 };
 
-use crate::models::{projects::{Project, ProjectDocument}, systems::{SysWithScope, System, SysWithScope2}};
+use crate::models::{
+    projects::{Project, ProjectDocument},
+    systems::{SysWithScope, SysWithScope2, System},
+};
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
     let collection = db.collection::<ProjectDocument>("projects");
     let stage_lookup = vec![
-        doc!{"$unwind": {"path":"$systems"}},
-        doc!{
+        doc! {"$unwind": {"path":"$systems"}},
+        doc! {
             "$lookup":{
                 "from":"systems",
                 "localField": "systems.system",
@@ -18,15 +21,15 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
                 "as": "systems.system"
             },
         },
-        doc!{"$unwind": {"path":"$systems.system"}},
-        doc!{"$group": 
+        doc! {"$unwind": {"path":"$systems.system"}},
+        doc! {"$group":
             {
             "_id":"$_id",
             "systems": {
                 "$push":"$systems"
             }
         }},
-        doc!{
+        doc! {
             "$lookup":{
                 "from":"projects",
                 "localField": "_id",
@@ -34,23 +37,23 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
                 "as": "projectDetails"
             },
         },
-        doc!{"$unwind": {"path":"$projectDetails"}},
-        doc!{"$addFields": {
+        doc! {"$unwind": {"path":"$projectDetails"}},
+        doc! {"$addFields": {
             "projectDetails.systems":"$systems"
         }},
-        doc!{
+        doc! {
         "$replaceRoot": {
             "newRoot": "$projectDetails"
             }
         },
-        doc!{
+        doc! {
         "$lookup":{
             "from":"contractors",
             "localField": "contractor",
             "foreignField":"_id",
             "as": "contractor"
         }},
-        doc!{"$unwind": {"path":"$contractor"}},
+        doc! {"$unwind": {"path":"$contractor"}},
     ];
 
     let pipeline = stage_lookup;
@@ -83,11 +86,8 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
             duration: doc.duration,
             startDate: doc.startDate.to_string(),
             completionDate: doc.completionDate.to_string(),
-            contractor: doc.contractor[0]
-                .get_str("name")
-                .unwrap_or("No Name")
-                .to_string(),
-            systems: vec!["DENEME".to_string()]
+            contractor: doc.contractor.to_string(),
+            systems: vec!["DENEME".to_string()],
         };
 
         projects.push(projects_json);

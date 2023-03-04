@@ -14,7 +14,7 @@ pub struct ProjectDocument {
     pub duration: i32,
     pub startDate: DateTime,
     pub completionDate: DateTime,
-    pub contractor: Vec<Document>,
+    pub contractor: Document,
     pub systems: Vec<SysWithScope2>,
 }
 
