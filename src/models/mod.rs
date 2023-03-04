@@ -4,3 +4,4 @@ pub mod projects;
 pub mod response;
 pub mod systems;
 pub mod users;
+pub mod equipment;

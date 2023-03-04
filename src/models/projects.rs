@@ -1,7 +1,7 @@
 use mongodb::bson::{oid::ObjectId, DateTime, Document};
 use serde::{Deserialize, Serialize};
 
-use super::systems::{SysWithScope, SysWithScopeDocument};
+use super::systems::SysWithScope;
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize, Debug)]

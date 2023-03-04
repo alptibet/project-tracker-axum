@@ -1,12 +1,12 @@
 use futures::StreamExt;
 use mongodb::{
-    bson::{self, doc, Document},
+    bson::{self, doc},
     Database,
 };
 
 use crate::models::{
     projects::{Project, ProjectDocument},
-    systems::{SysWithScope, SysWithScopeDocument, System},
+    systems::SysWithScope,
 };
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
