@@ -26,13 +26,13 @@ pub enum Scope {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct SysWithScope {
+pub struct SysWithScopeDocument {
     pub system: SystemDocument,
     pub scope: Scope,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct SysWithScope2 {
-    pub system: Document,
+pub struct SysWithScope {
+    pub system: String,
     pub scope: String,
 }

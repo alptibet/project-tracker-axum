@@ -1,12 +1,12 @@
 use futures::StreamExt;
 use mongodb::{
-    bson::{self, doc},
+    bson::{self, doc, Document},
     Database,
 };
 
 use crate::models::{
     projects::{Project, ProjectDocument},
-    systems::{SysWithScope, SysWithScope2, System},
+    systems::{SysWithScope, SysWithScopeDocument, System},
 };
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
@@ -62,19 +62,22 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
     let mut projects: Vec<Project> = vec![];
 
     while let Some(result) = results.next().await {
-        dbg!(&result);
         let doc: ProjectDocument = bson::from_document(result?)?;
-        dbg!(&doc);
-        let mut systems: Vec<SysWithScope2> = vec![];
+        let mut systems: Vec<SysWithScope> = vec![];
         for system in doc.systems {
-            dbg!(system);
-            // systems.push(SysWithScope{
-            //     system: System {
-            //         _id: system._id,
-            //         name: system.name
-            //     },
-            //     scope: system.scope.to_string()
-            // });
+            let scope = system.get_str("scope").unwrap().to_string();
+            let sys_name = system
+                .get("system")
+                .unwrap()
+                .as_document()
+                .unwrap()
+                .get_str("name")
+                .unwrap()
+                .to_string();
+            systems.push(SysWithScope {
+                system: sys_name,
+                scope,
+            })
         }
 
         let projects_json = Project {
@@ -86,12 +89,10 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
             duration: doc.duration,
             startDate: doc.startDate.to_string(),
             completionDate: doc.completionDate.to_string(),
-            contractor: doc.contractor.to_string(),
-            systems: vec!["DENEME".to_string()],
+            contractor: doc.contractor.get_str("name").unwrap().to_string(),
+            systems,
         };
-
         projects.push(projects_json);
     }
-
     Ok(projects)
 }
