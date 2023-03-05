@@ -1,6 +1,6 @@
 use futures::StreamExt;
 use mongodb::{
-    bson::{self, doc},
+    bson::{self, doc, oid::ObjectId},
     Database,
 };
 
@@ -99,4 +99,8 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
         projects.push(projects_json);
     }
     Ok(projects)
+}
+
+pub async fn get_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<Project>> {
+    todo!()
 }
