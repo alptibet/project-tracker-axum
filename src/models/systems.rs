@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
 pub struct Systems {
-    pub systems: Vec<SysWithScope>,
+    pub systems: Vec<SysDetails>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -26,13 +26,13 @@ pub enum Scope {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct SysWithScopeDocument {
+pub struct SysDetailsDocument {
     pub system: SystemDocument,
     pub scope: Scope,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct SysWithScope {
+pub struct SysDetails {
     pub system: String,
     pub scope: String,
 }

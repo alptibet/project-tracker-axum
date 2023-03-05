@@ -1,7 +1,7 @@
 use mongodb::bson::{oid::ObjectId, DateTime, Document};
 use serde::{Deserialize, Serialize};
 
-use super::systems::SysWithScope;
+use super::systems::SysDetails;
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize, Debug)]
@@ -30,5 +30,5 @@ pub struct Project {
     pub startDate: String,
     pub completionDate: String,
     pub contractor: String,
-    pub systems: Vec<SysWithScope>,
+    pub systems: Vec<SysDetails>,
 }

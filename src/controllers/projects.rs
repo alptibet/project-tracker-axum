@@ -6,7 +6,7 @@ use mongodb::{
 
 use crate::models::{
     projects::{Project, ProjectDocument},
-    systems::SysWithScope,
+    systems::SysDetails,
 };
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
@@ -63,7 +63,7 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
 
     while let Some(result) = results.next().await {
         let doc: ProjectDocument = bson::from_document(result?)?;
-        let mut systems: Vec<SysWithScope> = vec![];
+        let mut systems: Vec<SysDetails> = vec![];
         for system in doc.systems {
             let scope = system.get_str("scope").unwrap().to_string();
             let sys_name = system
@@ -72,9 +72,9 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
                 .as_document()
                 .unwrap()
                 .get_str("name")
-                .unwrap()
+                .unwrap_or("No Name")
                 .to_string();
-            systems.push(SysWithScope {
+            systems.push(SysDetails {
                 system: sys_name,
                 scope,
             })
@@ -89,7 +89,11 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
             duration: doc.duration,
             startDate: doc.startDate.to_string(),
             completionDate: doc.completionDate.to_string(),
-            contractor: doc.contractor.get_str("name").unwrap().to_string(),
+            contractor: doc
+                .contractor
+                .get_str("name")
+                .unwrap_or("No Name")
+                .to_string(),
             systems,
         };
         projects.push(projects_json);
