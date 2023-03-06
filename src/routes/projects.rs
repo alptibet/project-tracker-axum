@@ -1,7 +1,7 @@
 use crate::controllers::projects;
 use crate::errors::AppError;
 use crate::models::projects::ProjectInput;
-use crate::models::response::{DocResponse, VecResponse};
+use crate::models::response::{DocResponse, MessageResponse, VecResponse};
 use crate::utils::parse_oid;
 use crate::{appstate::AppState, models::projects::Project};
 use axum::extract::{Json, Path, State};
@@ -48,10 +48,11 @@ pub async fn insert_project(
         })),
         Err(_error) => {
             let res = _error.to_string();
+            println!("{res:?}");
             if res.contains("code: 11000") {
                 return Err(AppError::DuplicateRecord);
             }
-            Err(AppError::InternalServerError)
+            Err(AppError::BadRequest)
         }
     }
 }

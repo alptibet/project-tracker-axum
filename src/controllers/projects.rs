@@ -2,13 +2,13 @@ use axum::Json;
 use chrono::Utc;
 use futures::StreamExt;
 use mongodb::{
-    bson::{self, doc, oid::ObjectId, Document},
+    bson::{self, doc, oid::ObjectId, Bson, Document},
     Database,
 };
 
 use crate::models::{
     projects::{Project, ProjectDocument, ProjectInput},
-    systems::SysDetails,
+    systems::{self, SysDetails, SysDetailsInput},
 };
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
@@ -202,7 +202,16 @@ pub async fn insert_one(
     let start_dt: bson::DateTime = chrono_dt.into();
     let chrono_dt: chrono::DateTime<Utc> = input.completionDate.parse().unwrap();
     let completion_dt: bson::DateTime = chrono_dt.into();
-    let project_document = doc! {"name": &input.name, "address":&input.address, "active": &input.active, "completed": &input.completed, "startDate": start_dt, "completionDate": completion_dt, "contractor": &input.contractor};
+    let systems = bson::to_bson(&input.systems).unwrap();
+
+    let project_document = doc! {"name": &input.name, "address":&input.address, "active": &input.active, "completed": &input.completed,"duration":&input.duration, "startDate": start_dt, "completionDate": completion_dt, "contractor": &input.contractor, "systems": systems};
+    let mut sysvec: Vec<SysDetails> = vec![];
+    for item in &input.systems {
+        let system = item.system.to_string();
+        let scope = item.scope.to_string();
+        sysvec.push(SysDetails { system, scope })
+    }
+
     let insert_one_result = collection.insert_one(project_document, None).await?;
     let project_json = Project {
         _id: insert_one_result
@@ -218,7 +227,7 @@ pub async fn insert_one(
         startDate: input.startDate.to_string(),
         completionDate: input.completionDate.to_string(),
         contractor: input.contractor.unwrap().to_string(),
-        systems: input.systems.to_vec(),
+        systems: sysvec,
     };
     Ok(project_json)
 }

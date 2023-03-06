@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use validator::Validate;
 
-use super::systems::SysDetails;
+use super::systems::{SysDetails, SysDetailsInput};
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize, Debug)]
@@ -56,7 +56,7 @@ pub struct ProjectInput {
     pub completionDate: String,
     #[validate(required(message = "Project must a contractor"))]
     pub contractor: Option<ObjectId>,
-    pub systems: Vec<SysDetails>,
+    pub systems: Vec<SysDetailsInput>,
 }
 
 #[async_trait]
