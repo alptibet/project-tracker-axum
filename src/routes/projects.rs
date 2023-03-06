@@ -39,7 +39,7 @@ pub async fn get_one_project(
 
 pub async fn insert_project(
     State(state): State<AppState>,
-    Json(input): Json<ProjectInput>,
+    input: ProjectInput,
 ) -> Result<Json<DocResponse<Project>>, AppError> {
     match projects::insert_one(&state.db, Json(input)).await {
         Ok(_project_doc) => Ok(Json(DocResponse {

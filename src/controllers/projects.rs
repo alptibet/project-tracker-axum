@@ -217,7 +217,7 @@ pub async fn insert_one(
         duration: input.duration,
         startDate: input.startDate.to_string(),
         completionDate: input.completionDate.to_string(),
-        contractor: input.contractor.to_string(),
+        contractor: input.contractor.unwrap().to_string(),
         systems: input.systems.to_vec(),
     };
     Ok(project_json)
