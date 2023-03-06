@@ -31,8 +31,14 @@ pub struct SysDetailsDocument {
     pub scope: Scope,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct SysDetails {
     pub system: String,
+    pub scope: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct SysDetailsInput {
+    pub system: ObjectId,
     pub scope: String,
 }

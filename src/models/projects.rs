@@ -32,3 +32,17 @@ pub struct Project {
     pub contractor: String,
     pub systems: Vec<SysDetails>,
 }
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize, Debug)]
+pub struct ProjectInput {
+    pub name: String,
+    pub address: String,
+    pub active: bool,
+    pub completed: bool,
+    pub duration: i32,
+    pub startDate: String,
+    pub completionDate: String,
+    pub contractor: ObjectId,
+    pub systems: Vec<SysDetails>,
+}
