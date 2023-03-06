@@ -24,12 +24,12 @@ pub async fn get_one_project(
     let oid = parse_oid(_id)?;
     match projects::get_one(&state.db, oid).await {
         Ok(_project_doc) => {
-            if _project_doc.is_none() {
+            if _project_doc. is_none() {
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
                 message: "success".to_string(),
-                data: _project_doc,
+                data: _project_doc.unwrap(),
             }))
         }
         Err(_error) => Err(AppError::BadRequest),
