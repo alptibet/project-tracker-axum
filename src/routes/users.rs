@@ -15,7 +15,7 @@ pub async fn get_all_users(
             message: "Success".to_string(),
             data: _users_doc,
         })),
-        Err(_error) => Err(AppError::NotFound),
+        Err(_error) => Err(AppError::BadRequest),
     }
 }
 

@@ -18,17 +18,11 @@ pub struct System {
     pub name: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum Scope {
     Design,
     Installation,
     Commissioning,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-pub struct SysDetailsDocument {
-    pub system: SystemDocument,
-    pub scope: Scope,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -40,5 +34,5 @@ pub struct SysDetails {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct SysDetailsInput {
     pub system: ObjectId,
-    pub scope: String,
+    pub scope: Scope,
 }

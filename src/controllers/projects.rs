@@ -8,7 +8,7 @@ use mongodb::{
 
 use crate::models::{
     projects::{Project, ProjectDocument, ProjectInput},
-    systems::SysDetails,
+    systems::{Scope, SysDetails},
 };
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
@@ -208,7 +208,11 @@ pub async fn insert_one(
     let mut sysvec: Vec<SysDetails> = vec![];
     for item in &input.systems {
         let system = item.system.to_string();
-        let scope = item.scope.to_string();
+        let scope = match item.scope {
+            Scope::Design => "Design".to_string(),
+            Scope::Installation => "Installation".to_string(),
+            Scope::Commissioning => "Commissioning".to_string(),
+        }; //How to handle other - return an error?
         sysvec.push(SysDetails { system, scope })
     }
 
