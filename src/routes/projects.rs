@@ -1,7 +1,7 @@
 use crate::controllers::projects;
 use crate::errors::AppError;
 use crate::models::projects::ProjectInput;
-use crate::models::response::{DocResponse, MessageResponse, VecResponse};
+use crate::models::response::{DocResponse, VecResponse};
 use crate::utils::parse_oid;
 use crate::{appstate::AppState, models::projects::Project};
 use axum::extract::{Json, Path, State};

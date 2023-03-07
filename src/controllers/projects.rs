@@ -2,13 +2,13 @@ use axum::Json;
 use chrono::Utc;
 use futures::StreamExt;
 use mongodb::{
-    bson::{self, doc, oid::ObjectId, Bson, Document},
+    bson::{self, doc, oid::ObjectId, Document},
     Database,
 };
 
 use crate::models::{
     projects::{Project, ProjectDocument, ProjectInput},
-    systems::{self, SysDetails, SysDetailsInput},
+    systems::SysDetails,
 };
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
