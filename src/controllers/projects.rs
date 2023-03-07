@@ -3,6 +3,7 @@ use chrono::Utc;
 use futures::StreamExt;
 use mongodb::{
     bson::{self, doc, oid::ObjectId, Document},
+    options::{FindOneAndUpdateOptions, ReturnDocument},
     Database,
 };
 
@@ -234,4 +235,41 @@ pub async fn insert_one(
         systems: sysvec,
     };
     Ok(project_json)
+}
+
+pub async fn update_one(
+    db: &Database,
+    oid: ObjectId,
+    input: Json<ProjectUpdate>,
+) -> mongodb::error::Result<Option<Project>> {
+    let collection = db.collection::<ProjectDocument>("projects");
+    let update_options = FindOneAndUpdateOptions::builder()
+        .return_document(ReturnDocument::After)
+        .build();
+
+    let project_doc = collection
+        .find_one_and_update(
+            doc! {"_id":oid},
+            doc! {{/*insert here doc*/}},
+            update_options,
+        )
+        .await?;
+    if project_doc.is_none() {
+        return Ok(None);
+    };
+    let unwrapped_doc = user_doc.unwrap();
+    let user_json = Project {
+        _id: todo!(),
+        name: todo!(),
+        address: todo!(),
+        active: todo!(),
+        completed: todo!(),
+        duration: todo!(),
+        startDate: todo!(),
+        completionDate: todo!(),
+        contractor: todo!(),
+        systems: todo!(),
+    };
+
+    Ok(Some(user_json))
 }

@@ -56,3 +56,32 @@ pub async fn insert_project(
         }
     }
 }
+
+pub async fn update_project(
+    Path(_id): Path<String>,
+    State(state): State<AppState>,
+    input: ProjectUpdate,
+) -> Result<Json<DocResponse<Project>>, AppError> {
+    let oid = parse_oid(_id)?;
+    match projects::update_one(&state.db, oid, Json(input)).await {
+        Ok(_user_doc) => {
+            if _user_doc.is_none() {
+                return Err(AppError::NotFound);
+            }
+            Ok(Json(DocResponse {
+                message: "success".to_string(),
+                data: _user_doc.unwrap(),
+            }))
+        }
+        Err(_error) => {
+            let error = _error.kind.to_string();
+            if error.contains("username_1") {
+                return Err(AppError::UserAlreadyExists);
+            }
+            if error.contains("email_1") {
+                return Err(AppError::EmailAlreadyExists);
+            }
+            Err(AppError::BadRequest)
+        }
+    }
+}
