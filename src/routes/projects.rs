@@ -1,6 +1,6 @@
 use crate::controllers::projects;
 use crate::errors::AppError;
-use crate::models::projects::ProjectInput;
+use crate::models::projects::{ProjectInput, ProjectUpdate};
 use crate::models::response::{DocResponse, VecResponse};
 use crate::utils::parse_oid;
 use crate::{appstate::AppState, models::projects::Project};
@@ -14,7 +14,10 @@ pub async fn get_all_projects(
             message: "Success".to_string(),
             data: _projects_doc,
         })),
-        Err(_error) => Err(AppError::BadRequest),
+        Err(_error) => {
+            dbg!(_error);
+            Err(AppError::BadRequest)
+        }
     }
 }
 
@@ -64,13 +67,13 @@ pub async fn update_project(
 ) -> Result<Json<DocResponse<Project>>, AppError> {
     let oid = parse_oid(_id)?;
     match projects::update_one(&state.db, oid, Json(input)).await {
-        Ok(_user_doc) => {
-            if _user_doc.is_none() {
+        Ok(_project_doc) => {
+            if _project_doc.is_none() {
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
                 message: "success".to_string(),
-                data: _user_doc.unwrap(),
+                data: _project_doc.unwrap(),
             }))
         }
         Err(_error) => {

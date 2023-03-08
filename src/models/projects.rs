@@ -6,12 +6,12 @@ use axum::{
     http::StatusCode,
     BoxError, RequestExt,
 };
-use mongodb::bson::{oid::ObjectId, DateTime, Document};
+use mongodb::bson::{oid::ObjectId, DateTime};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use validator::Validate;
 
-use super::systems::{SysDetails, SysDetailsInput};
+use super::systems::{SysDetails, SysDetailsInput, SystemDocument};
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize, Debug)]
@@ -24,8 +24,8 @@ pub struct ProjectDocument {
     pub duration: i32,
     pub startDate: DateTime,
     pub completionDate: DateTime,
-    pub contractor: Document,
-    pub systems: Vec<Document>,
+    pub contractor: ObjectId,
+    pub systems: Vec<SystemDocument>,
 }
 
 #[allow(non_snake_case)]
@@ -54,7 +54,7 @@ pub struct ProjectInput {
     pub duration: i32,
     pub startDate: String,
     pub completionDate: String,
-    #[validate(required(message = "Project must a contractor"))]
+    #[validate(required(message = "Project must have a contractor"))]
     pub contractor: Option<ObjectId>,
     pub systems: Vec<SysDetailsInput>,
 }
@@ -69,8 +69,8 @@ where
 {
     type Rejection = (StatusCode, Json<Value>);
     async fn from_request(req: Request<B>, _state: &S) -> Result<Self, Self::Rejection> {
-        let Json(user) = req.extract::<Json<ProjectInput>, _>().await.unwrap();
-        if let Err(errors) = user.validate() {
+        let Json(project) = req.extract::<Json<ProjectInput>, _>().await.unwrap();
+        if let Err(errors) = project.validate() {
             return Err((
                 StatusCode::BAD_REQUEST,
                 Json(json!({
@@ -79,6 +79,46 @@ where
                 })),
             ));
         }
-        Ok(user)
+        Ok(project)
+    }
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize, Debug, Validate)]
+pub struct ProjectUpdate {
+    #[validate(length(min = 3, message = "Name must be at least 3 characters long"))]
+    pub name: String,
+    pub address: String,
+    pub active: bool,
+    pub completed: bool,
+    pub duration: i32,
+    pub startDate: String,
+    pub completionDate: String,
+    #[validate(required(message = "Project must have a contractor"))]
+    pub contractor: Option<ObjectId>,
+    pub systems: Vec<SysDetailsInput>,
+}
+
+#[async_trait]
+impl<S, B> FromRequest<S, B> for ProjectUpdate
+where
+    B: HttpBody + Send + 'static,
+    B::Data: Send,
+    B::Error: Into<BoxError>,
+    S: Send + Sync,
+{
+    type Rejection = (StatusCode, Json<Value>);
+    async fn from_request(req: Request<B>, _state: &S) -> Result<Self, Self::Rejection> {
+        let Json(project) = req.extract::<Json<ProjectUpdate>, _>().await.unwrap();
+        if let Err(errors) = project.validate() {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                Json(json!({
+                    "status":"validation error",
+                    "errors": errors
+                })),
+            ));
+        }
+        Ok(project)
     }
 }
