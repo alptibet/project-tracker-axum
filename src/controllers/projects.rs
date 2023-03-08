@@ -8,12 +8,12 @@ use mongodb::{
 };
 
 use crate::models::{
-    projects::{Project, ProjectDocument, ProjectInput, ProjectUpdate},
+    projects::{Project, ProjectDocument, ProjectDocumentFind, ProjectInput, ProjectUpdate},
     systems::{Scope, SysDetails},
 };
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
-    let collection = db.collection::<ProjectDocument>("projects");
+    let collection = db.collection::<ProjectDocumentFind>("projects");
     let stage_lookup = vec![
         doc! {"$unwind": {"path":"$systems"}},
         doc! {
@@ -60,14 +60,14 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
     ];
 
     let mut results = collection.aggregate(stage_lookup, None).await?;
+
     let mut projects: Vec<Project> = vec![];
 
     while let Some(result) = results.next().await {
-        dbg!(&result);
-        let doc: ProjectDocument = bson::from_document(result?)?;
+        let doc: ProjectDocumentFind = bson::from_document(result?)?;
         let mut systems: Vec<SysDetails> = vec![];
         for system in doc.systems {
-            let scope = ;
+            let scope = system.get_str("scope").unwrap().to_string();
             let sys_name = system
                 .get("system")
                 .unwrap()
@@ -81,6 +81,7 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
                 scope,
             })
         }
+
         let projects_json = Project {
             _id: doc._id.to_string(),
             name: doc.name,
@@ -90,7 +91,11 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
             duration: doc.duration,
             startDate: doc.startDate.to_string(),
             completionDate: doc.completionDate.to_string(),
-            contractor: doc.contractor.to_string(),
+            contractor: doc
+                .contractor
+                .get_str("name")
+                .unwrap_or("No Name")
+                .to_string(),
             systems,
         };
         projects.push(projects_json);
@@ -99,7 +104,7 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
 }
 
 pub async fn get_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<Project>> {
-    let collection = db.collection::<ProjectDocument>("projects");
+    let collection = db.collection::<ProjectDocumentFind>("projects");
     let stage_lookup = vec![
         doc! {"$match": {"_id": oid}},
         doc! {"$unwind": {"path":"$systems"}},
@@ -149,7 +154,7 @@ pub async fn get_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Opt
     let mut results = collection.aggregate(stage_lookup, None).await?;
 
     if let Some(result) = results.next().await {
-        let doc: ProjectDocument = bson::from_document(result?)?;
+        let doc: ProjectDocumentFind = bson::from_document(result?)?;
         let mut systems: Vec<SysDetails> = vec![];
         for system in doc.systems {
             let scope = system.get_str("scope").unwrap().to_string();
@@ -176,7 +181,11 @@ pub async fn get_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Opt
             duration: doc.duration,
             startDate: doc.startDate.to_string(),
             completionDate: doc.completionDate.to_string(),
-            contractor: doc.contractor.to_string(),
+            contractor: doc
+                .contractor
+                .get_str("name")
+                .unwrap_or("No Name")
+                .to_string(),
             systems,
         };
         Ok(Some(projects_json))

@@ -77,12 +77,10 @@ pub async fn update_project(
             }))
         }
         Err(_error) => {
+            dbg!(&_error);
             let error = _error.kind.to_string();
-            if error.contains("username_1") {
-                return Err(AppError::UserAlreadyExists);
-            }
-            if error.contains("email_1") {
-                return Err(AppError::EmailAlreadyExists);
+            if error.contains("name_1") {
+                return Err(AppError::DuplicateRecord);
             }
             Err(AppError::BadRequest)
         }

@@ -6,12 +6,13 @@ use axum::{
     http::StatusCode,
     BoxError, RequestExt,
 };
+use bson::Document;
 use mongodb::bson::{oid::ObjectId, DateTime};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use validator::Validate;
 
-use super::systems::{SysDetails, SysDetailsInput, SystemDocument};
+use super::systems::{SysDetails, SysDetailsInput};
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize, Debug)]
@@ -25,7 +26,22 @@ pub struct ProjectDocument {
     pub startDate: DateTime,
     pub completionDate: DateTime,
     pub contractor: ObjectId,
-    pub systems: Vec<SystemDocument>,
+    pub systems: Vec<SysDetails>,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize, Debug)]
+pub struct ProjectDocumentFind {
+    pub _id: ObjectId,
+    pub name: String,
+    pub address: String,
+    pub active: bool,
+    pub completed: bool,
+    pub duration: i32,
+    pub startDate: DateTime,
+    pub completionDate: DateTime,
+    pub contractor: Document,
+    pub systems: Vec<Document>,
 }
 
 #[allow(non_snake_case)]
@@ -74,7 +90,7 @@ where
             return Err((
                 StatusCode::BAD_REQUEST,
                 Json(json!({
-                    "status":"validation error",
+                    "message":"validation error",
                     "errors": errors
                 })),
             ));
@@ -114,7 +130,7 @@ where
             return Err((
                 StatusCode::BAD_REQUEST,
                 Json(json!({
-                    "status":"validation error",
+                    "message":"validation error",
                     "errors": errors
                 })),
             ));
