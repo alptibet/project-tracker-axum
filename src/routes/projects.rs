@@ -1,6 +1,6 @@
 use crate::controllers::projects;
 use crate::errors::AppError;
-use crate::models::projects::{ProjectInput, ProjectUpdate};
+use crate::models::projects::ProjectInput;
 use crate::models::response::{DocResponse, VecResponse};
 use crate::utils::parse_oid;
 use crate::{appstate::AppState, models::projects::Project};
@@ -63,7 +63,7 @@ pub async fn insert_project(
 pub async fn update_project(
     Path(_id): Path<String>,
     State(state): State<AppState>,
-    input: ProjectUpdate,
+    input: ProjectInput,
 ) -> Result<Json<DocResponse<Project>>, AppError> {
     let oid = parse_oid(_id)?;
     match projects::update_one(&state.db, oid, Json(input)).await {

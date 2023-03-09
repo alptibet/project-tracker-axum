@@ -1,11 +1,6 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
-pub struct Systems {
-    pub systems: Vec<SysDetails>,
-}
-
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SystemDocument {
     pub _id: ObjectId,
@@ -18,21 +13,25 @@ pub struct System {
     pub name: String,
 }
 
+//Still could not figure out how to use if input is not of any of these
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum Scope {
     Design,
     Installation,
     Commissioning,
+    Nothing,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct SysDetails {
+pub struct Systems {
+    //was SysDetails
     pub system: String,
     pub scope: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct SysDetailsInput {
+pub struct SystemsDocument {
+    //was SysDetailsDocument
     pub system: ObjectId,
     pub scope: Scope,
 }

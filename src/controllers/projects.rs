@@ -8,12 +8,12 @@ use mongodb::{
 };
 
 use crate::models::{
-    projects::{Project, ProjectDocument, ProjectDocumentFind, ProjectInput, ProjectUpdate},
-    systems::{Scope, SysDetails},
+    projects::{Project, ProjectDocument, ProjectDocumentFind, ProjectInput},
+    systems::{Scope, Systems},
 };
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
-    let collection = db.collection::<ProjectDocumentFind>("projects");
+    let collection = db.collection::<ProjectDocument>("projects");
     let stage_lookup = vec![
         doc! {"$unwind": {"path":"$systems"}},
         doc! {
@@ -65,7 +65,7 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
 
     while let Some(result) = results.next().await {
         let doc: ProjectDocumentFind = bson::from_document(result?)?;
-        let mut systems: Vec<SysDetails> = vec![];
+        let mut systems: Vec<Systems> = vec![];
         for system in doc.systems {
             let scope = system.get_str("scope").unwrap().to_string();
             let sys_name = system
@@ -76,7 +76,7 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
                 .get_str("name")
                 .unwrap_or("No Name")
                 .to_string();
-            systems.push(SysDetails {
+            systems.push(Systems {
                 system: sys_name,
                 scope,
             })
@@ -104,7 +104,7 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Project>> {
 }
 
 pub async fn get_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<Project>> {
-    let collection = db.collection::<ProjectDocumentFind>("projects");
+    let collection = db.collection::<ProjectDocument>("projects");
     let stage_lookup = vec![
         doc! {"$match": {"_id": oid}},
         doc! {"$unwind": {"path":"$systems"}},
@@ -155,7 +155,7 @@ pub async fn get_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Opt
 
     if let Some(result) = results.next().await {
         let doc: ProjectDocumentFind = bson::from_document(result?)?;
-        let mut systems: Vec<SysDetails> = vec![];
+        let mut systems: Vec<Systems> = vec![];
         for system in doc.systems {
             let scope = system.get_str("scope").unwrap().to_string();
             let sys_name = system
@@ -166,7 +166,7 @@ pub async fn get_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Opt
                 .get_str("name")
                 .unwrap_or("No Name")
                 .to_string();
-            systems.push(SysDetails {
+            systems.push(Systems {
                 system: sys_name,
                 scope,
             })
@@ -207,15 +207,16 @@ pub async fn insert_one(
 
     let project_document = doc! {"name": &input.name, "address":&input.address, "active": &input.active, "completed": &input.completed,"duration":&input.duration, "startDate": start_dt, "completionDate": completion_dt, "contractor": &input.contractor, "systems": systems};
 
-    let mut sysvec: Vec<SysDetails> = vec![];
+    let mut sysvec: Vec<Systems> = vec![];
     for item in &input.systems {
         let system = item.system.to_string();
         let scope = match item.scope {
             Scope::Design => "Design".to_string(),
             Scope::Installation => "Installation".to_string(),
             Scope::Commissioning => "Commissioning".to_string(),
+            _ => "ERROR".to_string(),
         }; //How to handle other - return an error?
-        sysvec.push(SysDetails { system, scope })
+        sysvec.push(Systems { system, scope })
     }
 
     let insert_one_result = collection.insert_one(project_document, None).await?;
@@ -241,7 +242,7 @@ pub async fn insert_one(
 pub async fn update_one(
     db: &Database,
     oid: ObjectId,
-    input: Json<ProjectUpdate>,
+    input: Json<ProjectInput>,
 ) -> mongodb::error::Result<Option<Project>> {
     let collection = db.collection::<ProjectDocument>("projects");
     let update_options = FindOneAndUpdateOptions::builder()
@@ -253,7 +254,7 @@ pub async fn update_one(
     let chrono_dt: chrono::DateTime<Utc> = input.completionDate.parse().unwrap();
     let completion_dt: bson::DateTime = chrono_dt.into();
     let systems = bson::to_bson(&input.systems).unwrap();
-    let mut sysvec: Vec<SysDetails> = vec![];
+    let mut sysvec: Vec<Systems> = vec![];
 
     for item in &input.systems {
         let system = item.system.to_string();
@@ -261,8 +262,9 @@ pub async fn update_one(
             Scope::Design => "Design".to_string(),
             Scope::Installation => "Installation".to_string(),
             Scope::Commissioning => "Commissioning".to_string(),
+            _ => "ERROR".to_string(),
         }; //How to handle other - return an error?
-        sysvec.push(SysDetails { system, scope })
+        sysvec.push(Systems { system, scope })
     }
 
     let project_doc = collection

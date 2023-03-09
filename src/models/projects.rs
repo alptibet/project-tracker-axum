@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use validator::Validate;
 
-use super::systems::{SysDetails, SysDetailsInput};
+use super::systems::{Systems, SystemsDocument};
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize, Debug)]
@@ -26,9 +26,10 @@ pub struct ProjectDocument {
     pub startDate: DateTime,
     pub completionDate: DateTime,
     pub contractor: ObjectId,
-    pub systems: Vec<SysDetails>,
+    pub systems: Vec<SystemsDocument>,
 }
 
+// -> I ha to create this struct to use documets returned from pipelines, since the pipeline operations return documents for referenced fields.
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ProjectDocumentFind {
@@ -56,7 +57,7 @@ pub struct Project {
     pub startDate: String,
     pub completionDate: String,
     pub contractor: String,
-    pub systems: Vec<SysDetails>,
+    pub systems: Vec<Systems>,
 }
 
 #[allow(non_snake_case)]
@@ -72,7 +73,7 @@ pub struct ProjectInput {
     pub completionDate: String,
     #[validate(required(message = "Project must have a contractor"))]
     pub contractor: Option<ObjectId>,
-    pub systems: Vec<SysDetailsInput>,
+    pub systems: Vec<SystemsDocument>,
 }
 
 #[async_trait]
@@ -86,46 +87,6 @@ where
     type Rejection = (StatusCode, Json<Value>);
     async fn from_request(req: Request<B>, _state: &S) -> Result<Self, Self::Rejection> {
         let Json(project) = req.extract::<Json<ProjectInput>, _>().await.unwrap();
-        if let Err(errors) = project.validate() {
-            return Err((
-                StatusCode::BAD_REQUEST,
-                Json(json!({
-                    "message":"validation error",
-                    "errors": errors
-                })),
-            ));
-        }
-        Ok(project)
-    }
-}
-
-#[allow(non_snake_case)]
-#[derive(Deserialize, Serialize, Debug, Validate)]
-pub struct ProjectUpdate {
-    #[validate(length(min = 3, message = "Name must be at least 3 characters long"))]
-    pub name: String,
-    pub address: String,
-    pub active: bool,
-    pub completed: bool,
-    pub duration: i32,
-    pub startDate: String,
-    pub completionDate: String,
-    #[validate(required(message = "Project must have a contractor"))]
-    pub contractor: Option<ObjectId>,
-    pub systems: Vec<SysDetailsInput>,
-}
-
-#[async_trait]
-impl<S, B> FromRequest<S, B> for ProjectUpdate
-where
-    B: HttpBody + Send + 'static,
-    B::Data: Send,
-    B::Error: Into<BoxError>,
-    S: Send + Sync,
-{
-    type Rejection = (StatusCode, Json<Value>);
-    async fn from_request(req: Request<B>, _state: &S) -> Result<Self, Self::Rejection> {
-        let Json(project) = req.extract::<Json<ProjectUpdate>, _>().await.unwrap();
         if let Err(errors) = project.validate() {
             return Err((
                 StatusCode::BAD_REQUEST,
