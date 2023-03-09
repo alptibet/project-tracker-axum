@@ -8,7 +8,7 @@ use self::{
         delete_contractor, get_all_contractors, get_one_contractor, insert_contractor,
         update_contractor,
     },
-    projects::{get_all_projects, get_one_project, insert_project, update_project},
+    projects::{delete_project, get_all_projects, get_one_project, insert_project, update_project},
     users::{get_all_users, get_me, get_one_user, update_me, update_user},
 };
 use crate::{
@@ -27,7 +27,10 @@ use tower_http::trace::TraceLayer;
 pub async fn create_routes(appstate: AppState) -> Router {
     tracing_subscriber::fmt::init();
     Router::new()
-        .route("/api/v1/projects/:id", patch(update_project))
+        .route(
+            "/api/v1/projects/:id",
+            patch(update_project).delete(delete_project),
+        )
         .route("/api/v1/projects", post(insert_project))
         .route("/api/v1/projects/:id", get(get_one_project))
         .route("/api/v1/projects", get(get_all_projects))

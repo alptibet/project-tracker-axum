@@ -291,3 +291,45 @@ pub async fn update_one(
     };
     Ok(Some(project_json))
 }
+
+pub async fn delete_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<Project>> {
+    let collection = db.collection::<ProjectDocument>("projects");
+
+    let project_doc = collection
+        .find_one_and_delete(doc! {"_id": oid}, None)
+        .await?;
+
+    if project_doc.is_none() {
+        return Ok(None);
+    };
+
+    let unwrapped_doc = project_doc.unwrap();
+    let mut systems: Vec<Systems> = vec![];
+    for item in unwrapped_doc.systems {
+        let scope = match item.scope {
+            Scope::Design => "Design".to_string(),
+            Scope::Installation => "Installation".to_string(),
+            Scope::Commissioning => "Commissioning".to_string(),
+            _ => "ERROR".to_string(),
+        }; //How to handle other - return an error?
+        let sys_name = item.system.to_string();
+        systems.push(Systems {
+            system: sys_name,
+            scope,
+        })
+    }
+
+    let project_json = Project {
+        _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name.to_string(),
+        address: unwrapped_doc.address.to_string(),
+        active: unwrapped_doc.active,
+        completed: unwrapped_doc.completed,
+        duration: unwrapped_doc.duration,
+        startDate: unwrapped_doc.startDate.to_string(),
+        completionDate: unwrapped_doc.completionDate.to_string(),
+        contractor: unwrapped_doc.contractor.to_string(),
+        systems,
+    };
+    Ok(Some(project_json))
+}
