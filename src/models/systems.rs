@@ -19,7 +19,6 @@ pub enum Scope {
     Design,
     Installation,
     Commissioning,
-    Nothing,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]

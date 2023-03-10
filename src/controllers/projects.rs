@@ -214,7 +214,6 @@ pub async fn insert_one(
             Scope::Design => "Design".to_string(),
             Scope::Installation => "Installation".to_string(),
             Scope::Commissioning => "Commissioning".to_string(),
-            _ => "ERROR".to_string(),
         }; //How to handle other - return an error?
         sysvec.push(Systems { system, scope })
     }
@@ -262,7 +261,6 @@ pub async fn update_one(
             Scope::Design => "Design".to_string(),
             Scope::Installation => "Installation".to_string(),
             Scope::Commissioning => "Commissioning".to_string(),
-            _ => "ERROR".to_string(),
         }; //How to handle other - return an error?
         sysvec.push(Systems { system, scope })
     }
@@ -310,7 +308,6 @@ pub async fn delete_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<
             Scope::Design => "Design".to_string(),
             Scope::Installation => "Installation".to_string(),
             Scope::Commissioning => "Commissioning".to_string(),
-            _ => "ERROR".to_string(),
         }; //How to handle other - return an error?
         let sys_name = item.system.to_string();
         systems.push(Systems {
