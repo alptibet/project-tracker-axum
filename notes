@@ -1,0 +1,8 @@
+insert material
+db.projects.updateOne({"name":"PROJECT", "systems.name":"Fire"}, {$push:{"systems.$.materials":{"brand":"BOSCH", "partNumber":"BUAT", "qty":12}}})
+
+pull and push to update
+db.projects.updateOne({"name":"PROJECT", "systems.name":"Fire"}, {$pull:{"systems.$.materials":{"brand":"BOSCH", "partNumber":"BUAT", "qty":12}}})
+
+pull with partNumber 
+db.projects.updateOne({"name":"PROJECT", "systems.name":"Fire"}, {$pull:{"systems.$.materials":{partNumber:"AAA"}}})
