@@ -79,6 +79,22 @@ pub struct ProjectDocumentWithoutMaterials {
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize)]
+pub struct ProjectDocumentToDelete {
+    pub _id: ObjectId,
+    pub name: String,
+    pub contractor: String,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize)]
+pub struct DeletedProject {
+    pub _id: String,
+    pub name: String,
+    pub contractor: String,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize)]
 pub struct ProjectWithMaterials {
     pub _id: String,
     pub name: String,

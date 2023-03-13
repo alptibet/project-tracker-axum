@@ -1,6 +1,7 @@
 use axum::Json;
 use chrono::Utc;
 use futures::TryStreamExt;
+use mongodb::options::{FindOneAndUpdateOptions, ReturnDocument};
 use mongodb::Database;
 use mongodb::{
     bson::oid::ObjectId,
@@ -9,8 +10,8 @@ use mongodb::{
 };
 
 use crate::models::projects::{
-    ProjectDocumentWithMaterials, ProjectDocumentWithoutMaterials, ProjectInput,
-    ProjectWithMaterials, ProjectWithoutMaterials,
+    DeletedProject, ProjectDocumentToDelete, ProjectDocumentWithMaterials,
+    ProjectDocumentWithoutMaterials, ProjectInput, ProjectWithMaterials, ProjectWithoutMaterials,
 };
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<ProjectWithoutMaterials>> {
@@ -104,7 +105,7 @@ pub async fn insert_one(
     let chrono_dt: chrono::DateTime<Utc> = input.completionDate.parse().unwrap();
     let completion_date: bson::DateTime = chrono_dt.into();
     let systems = bson::to_bson(&input.systems)?;
-    let project_doc = doc! {"name": &input.name.clone(), "address":&input.address, "active": &input.active, "completed":&input.completed, "startDate":start_date, "completionDate":completion_date, "contractor": &input.contractor, "systems":systems };
+    let project_doc = doc! {"name": &input.name.clone(), "address":&input.address, "active": &input.active, "completed":&input.completed, "duration":&input.duration,"startDate":start_date, "completionDate":completion_date, "contractor": &input.contractor, "systems":systems };
 
     let result = collection.insert_one(project_doc, None).await?;
 
@@ -123,95 +124,67 @@ pub async fn insert_one(
     Ok(project_json)
 }
 
-// pub async fn update_one(
-//     db: &Database,
-//     oid: ObjectId,
-//     input: Json<ProjectInput>,
-// ) -> mongodb::error::Result<Option<Project>> {
-//     let collection = db.collection::<ProjectDocument>("projects");
-//     let update_options = FindOneAndUpdateOptions::builder()
-//         .return_document(ReturnDocument::After)
-//         .build();
+pub async fn update_one(
+    db: &Database,
+    oid: ObjectId,
+    input: Json<ProjectInput>,
+) -> mongodb::error::Result<Option<ProjectWithoutMaterials>> {
+    let collection = db.collection::<ProjectDocumentWithoutMaterials>("projects");
+    let update_options = FindOneAndUpdateOptions::builder()
+        .return_document(ReturnDocument::After)
+        .build();
 
-//     let chrono_dt: chrono::DateTime<Utc> = input.startDate.parse().unwrap();
-//     let start_dt: bson::DateTime = chrono_dt.into();
-//     let chrono_dt: chrono::DateTime<Utc> = input.completionDate.parse().unwrap();
-//     let completion_dt: bson::DateTime = chrono_dt.into();
-//     let systems = bson::to_bson(&input.systems).unwrap();
-//     let mut sysvec: Vec<Systems> = vec![];
+    let chrono_dt: chrono::DateTime<Utc> = input.startDate.parse().unwrap();
+    let start_dt: bson::DateTime = chrono_dt.into();
+    let chrono_dt: chrono::DateTime<Utc> = input.completionDate.parse().unwrap();
+    let completion_dt: bson::DateTime = chrono_dt.into();
+    let systems = bson::to_bson(&input.systems).unwrap();
 
-//     for item in &input.systems {
-//         let system = item.system.to_string();
-//         let scope = match item.scope {
-//             Scope::Design => "Design".to_string(),
-//             Scope::Installation => "Installation".to_string(),
-//             Scope::Commissioning => "Commissioning".to_string(),
-//         }; //How to handle other - return an error?
-//         sysvec.push(Systems { system, scope })
-//     }
+    let project_doc = collection
+    .find_one_and_update(
+        doc! {"_id":oid},
+        doc! {"$set":{"name": &input.name, "address":&input.address, "active": &input.active, "completed": &input.completed,"duration":&input.duration, "startDate": start_dt, "completionDate": completion_dt, "contractor":&input.contractor, "systems":systems}}, update_options).await?;
 
-//     let project_doc = collection
-//     .find_one_and_update(
-//         doc! {"_id":oid},
-//         doc! {"$set":{"name": &input.name, "address":&input.address, "active": &input.active, "completed": &input.completed,"duration":&input.duration, "startDate": start_dt, "completionDate": completion_dt, "contractor":&input.contractor, "systems":systems}}, update_options).await?;
+    if project_doc.is_none() {
+        return Ok(None);
+    };
 
-//     if project_doc.is_none() {
-//         return Ok(None);
-//     };
+    let unwrapped_doc = project_doc.unwrap();
+    let project_json = ProjectWithoutMaterials {
+        _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name.to_string(),
+        address: unwrapped_doc.address.to_string(),
+        active: unwrapped_doc.active,
+        completed: unwrapped_doc.completed,
+        duration: unwrapped_doc.duration,
+        startDate: unwrapped_doc.startDate.to_string(),
+        completionDate: unwrapped_doc.completionDate.to_string(),
+        contractor: unwrapped_doc.contractor,
+        systems: unwrapped_doc.systems,
+    };
+    Ok(Some(project_json))
+}
 
-//     let unwrapped_doc = project_doc.unwrap();
-//     let project_json = Project {
-//         _id: unwrapped_doc._id.to_string(),
-//         name: unwrapped_doc.name.to_string(),
-//         address: unwrapped_doc.address.to_string(),
-//         active: unwrapped_doc.active,
-//         completed: unwrapped_doc.completed,
-//         duration: unwrapped_doc.duration,
-//         startDate: unwrapped_doc.startDate.to_string(),
-//         completionDate: unwrapped_doc.completionDate.to_string(),
-//         contractor: unwrapped_doc.contractor.to_string(),
-//         systems: sysvec,
-//     };
-//     Ok(Some(project_json))
-// }
+pub async fn delete_one(
+    db: &Database,
+    oid: ObjectId,
+) -> mongodb::error::Result<Option<DeletedProject>> {
+    let collection = db.collection::<ProjectDocumentToDelete>("projects");
 
-// pub async fn delete_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Option<Project>> {
-//     let collection = db.collection::<ProjectDocument>("projects");
+    let project_doc = collection
+        .find_one_and_delete(doc! {"_id": oid}, None)
+        .await?;
 
-//     let project_doc = collection
-//         .find_one_and_delete(doc! {"_id": oid}, None)
-//         .await?;
+    if project_doc.is_none() {
+        return Ok(None);
+    };
 
-//     if project_doc.is_none() {
-//         return Ok(None);
-//     };
+    let unwrapped_doc = project_doc.unwrap();
 
-//     let unwrapped_doc = project_doc.unwrap();
-//     let mut systems: Vec<Systems> = vec![];
-//     for item in unwrapped_doc.systems {
-//         let scope = match item.scope {
-//             Scope::Design => "Design".to_string(),
-//             Scope::Installation => "Installation".to_string(),
-//             Scope::Commissioning => "Commissioning".to_string(),
-//         }; //How to handle other - return an error?
-//         let sys_name = item.system.to_string();
-//         systems.push(Systems {
-//             system: sys_name,
-//             scope,
-//         })
-//     }
-
-//     let project_json = Project {
-//         _id: unwrapped_doc._id.to_string(),
-//         name: unwrapped_doc.name.to_string(),
-//         address: unwrapped_doc.address.to_string(),
-//         active: unwrapped_doc.active,
-//         completed: unwrapped_doc.completed,
-//         duration: unwrapped_doc.duration,
-//         startDate: unwrapped_doc.startDate.to_string(),
-//         completionDate: unwrapped_doc.completionDate.to_string(),
-//         contractor: unwrapped_doc.contractor.to_string(),
-//         systems,
-//     };
-//     Ok(Some(project_json))
-// }
+    let project_json = DeletedProject {
+        _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name,
+        contractor: unwrapped_doc.contractor,
+    };
+    Ok(Some(project_json))
+}
