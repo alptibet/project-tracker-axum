@@ -110,7 +110,7 @@ pub async fn insert_one(
     let result = collection.insert_one(project_doc, None).await?;
 
     let project_json = ProjectWithoutMaterials {
-        _id: result.inserted_id.to_string(),
+        _id: result.inserted_id.as_object_id().unwrap().to_string(),
         name: input.name.to_string(),
         address: input.address.clone(),
         active: input.active,

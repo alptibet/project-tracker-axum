@@ -1,9 +1,7 @@
 use crate::controllers::projects;
 use crate::errors::AppError;
 
-use crate::models::projects::{
-    DeletedProject, ProjectDocumentToDelete, ProjectInput, ProjectWithMaterials,
-};
+use crate::models::projects::{DeletedProject, ProjectInput, ProjectWithMaterials};
 use crate::models::response::{DocResponse, VecResponse};
 
 use crate::utils::parse_oid;
