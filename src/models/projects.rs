@@ -12,11 +12,44 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use validator::Validate;
 
-use super::systems::{Systems, SystemsDocument};
+#[derive(Deserialize, Serialize)]
+pub enum Scope {
+    Design(String),
+    Installation(String),
+    Commissioning(String),
+}
+
+#[derive(Deserialize, Serialize)]
+pub enum SystemName {
+    Fire(String),
+    Public(String),
+    Hvac(String),
+}
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize, Debug)]
-pub struct ProjectDocument {
+#[derive(Deserialize, Serialize, Clone)]
+pub struct Material {
+    pub partNumber: String,
+    pub brand: String,
+    pub qty: i32,
+}
+
+#[derive(Deserialize, Serialize, Clone)]
+pub struct SystemWithMaterials {
+    pub name: String,
+    pub scope: Vec<String>,
+    pub materials: Vec<Material>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct SystemWithoutMaterials {
+    pub name: String,
+    pub scope: Vec<String>,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize)]
+pub struct ProjectDocumentWithMaterials {
     pub _id: ObjectId,
     pub name: String,
     pub address: String,
@@ -25,11 +58,55 @@ pub struct ProjectDocument {
     pub duration: i32,
     pub startDate: DateTime,
     pub completionDate: DateTime,
-    pub contractor: ObjectId,
-    pub systems: Vec<SystemsDocument>,
+    pub contractor: String,
+    pub systems: Vec<SystemWithMaterials>,
 }
 
-// -> I ha to create this struct to use documets returned from pipelines, since the pipeline operations return documents for referenced fields.
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize)]
+pub struct ProjectDocumentWithoutMaterials {
+    pub _id: ObjectId,
+    pub name: String,
+    pub address: String,
+    pub active: bool,
+    pub completed: bool,
+    pub duration: i32,
+    pub startDate: DateTime,
+    pub completionDate: DateTime,
+    pub contractor: String,
+    pub systems: Vec<SystemWithoutMaterials>,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize)]
+pub struct ProjectWithMaterials {
+    pub _id: String,
+    pub name: String,
+    pub address: String,
+    pub active: bool,
+    pub completed: bool,
+    pub duration: i32,
+    pub startDate: String,
+    pub completionDate: String,
+    pub contractor: String,
+    pub systems: Vec<SystemWithMaterials>,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize)]
+pub struct ProjectWithoutMaterials {
+    pub _id: String,
+    pub name: String,
+    pub address: String,
+    pub active: bool,
+    pub completed: bool,
+    pub duration: i32,
+    pub startDate: String,
+    pub completionDate: String,
+    pub contractor: String,
+    pub systems: Vec<SystemWithoutMaterials>,
+}
+
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ProjectDocumentFind {
@@ -46,22 +123,7 @@ pub struct ProjectDocumentFind {
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize, Debug)]
-pub struct Project {
-    pub _id: String,
-    pub name: String,
-    pub address: String,
-    pub active: bool,
-    pub completed: bool,
-    pub duration: i32,
-    pub startDate: String,
-    pub completionDate: String,
-    pub contractor: String,
-    pub systems: Vec<Systems>,
-}
-
-#[allow(non_snake_case)]
-#[derive(Deserialize, Serialize, Debug, Validate)]
+#[derive(Deserialize, Serialize, Validate, Debug)]
 pub struct ProjectInput {
     #[validate(length(min = 3, message = "Name must be at least 3 characters long"))]
     pub name: String,
@@ -72,8 +134,8 @@ pub struct ProjectInput {
     pub startDate: String,
     pub completionDate: String,
     #[validate(required(message = "Project must have a contractor"))]
-    pub contractor: Option<ObjectId>,
-    pub systems: Vec<SystemsDocument>,
+    pub contractor: Option<String>,
+    pub systems: Vec<SystemWithoutMaterials>,
 }
 
 #[async_trait]
