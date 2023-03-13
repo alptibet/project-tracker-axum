@@ -6,7 +6,6 @@ use axum::{
     http::StatusCode,
     BoxError, RequestExt,
 };
-use bson::Document;
 use mongodb::bson::{oid::ObjectId, DateTime};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -27,11 +26,20 @@ pub enum SystemName {
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct Material {
     pub partNumber: String,
     pub brand: String,
     pub qty: i32,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct MaterialWithSysIndicator {
+    pub partNumber: String,
+    pub brand: String,
+    pub qty: i32,
+    pub system: String,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -124,22 +132,23 @@ pub struct ProjectWithoutMaterials {
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize, Debug)]
-pub struct ProjectDocumentFind {
+#[derive(Deserialize, Serialize)]
+pub struct UpdatedMaterialsDocument {
     pub _id: ObjectId,
     pub name: String,
-    pub address: String,
-    pub active: bool,
-    pub completed: bool,
-    pub duration: i32,
-    pub startDate: DateTime,
-    pub completionDate: DateTime,
-    pub contractor: Document,
-    pub systems: Vec<Document>,
+    pub systems: Vec<SystemWithMaterials>,
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize, Validate, Debug)]
+#[derive(Deserialize, Serialize)]
+pub struct UpdatedMaterials {
+    pub _id: String,
+    pub name: String,
+    pub systems: Vec<SystemWithMaterials>,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize, Validate)]
 pub struct ProjectInput {
     #[validate(length(min = 3, message = "Name must be at least 3 characters long"))]
     pub name: String,
@@ -151,7 +160,7 @@ pub struct ProjectInput {
     pub completionDate: String,
     #[validate(required(message = "Project must have a contractor"))]
     pub contractor: Option<String>,
-    pub systems: Vec<SystemWithoutMaterials>,
+    pub systems: Vec<SystemWithMaterials>,
 }
 
 #[async_trait]

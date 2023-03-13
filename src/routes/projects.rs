@@ -1,7 +1,9 @@
 use crate::controllers::projects;
 use crate::errors::AppError;
 
-use crate::models::projects::{DeletedProject, ProjectInput, ProjectWithMaterials};
+use crate::models::projects::{
+    DeletedProject, MaterialWithSysIndicator, ProjectInput, ProjectWithMaterials, UpdatedMaterials,
+};
 use crate::models::response::{DocResponse, VecResponse};
 
 use crate::utils::parse_oid;
@@ -57,15 +59,18 @@ pub async fn get_one_project_with_materials(
                 data: _project_doc.unwrap(),
             }))
         }
-        Err(_error) => Err(AppError::BadRequest),
+        Err(_error) => {
+            dbg!(_error);
+            Err(AppError::BadRequest)
+        }
     }
 }
 
-//Inserts a project without materials
+//Inserts a project with empty materials array
 pub async fn insert_project(
     State(state): State<AppState>,
     input: ProjectInput,
-) -> Result<Json<DocResponse<ProjectWithoutMaterials>>, AppError> {
+) -> Result<Json<DocResponse<ProjectWithMaterials>>, AppError> {
     match projects::insert_one(&state.db, Json(input)).await {
         Ok(_project_doc) => Ok(Json(DocResponse {
             message: "Success".to_string(),
@@ -125,5 +130,62 @@ pub async fn delete_project(
             }))
         }
         Err(_error) => Err(AppError::BadRequest),
+    }
+}
+
+//Insert one material object to a project system
+pub async fn insert_project_material(
+    Path(_id): Path<String>,
+    State(state): State<AppState>,
+    Json(input): Json<MaterialWithSysIndicator>,
+) -> Result<Json<DocResponse<UpdatedMaterials>>, AppError> {
+    let oid = parse_oid(_id)?;
+    match projects::insert_material(&state.db, oid, input).await {
+        Ok(_project_doc) => Ok(Json(DocResponse {
+            message: "success".to_string(),
+            data: _project_doc.unwrap(),
+        })),
+        Err(_error) => {
+            dbg!(_error);
+            Err(AppError::BadRequest)
+        }
+    }
+}
+
+//Update one material object to a project system
+pub async fn update_project_material(
+    Path(_id): Path<String>,
+    State(state): State<AppState>,
+    Json(input): Json<MaterialWithSysIndicator>,
+) -> Result<Json<DocResponse<UpdatedMaterials>>, AppError> {
+    let oid = parse_oid(_id)?;
+    match projects::update_material(&state.db, oid, input).await {
+        Ok(_project_doc) => Ok(Json(DocResponse {
+            message: "success".to_string(),
+            data: _project_doc.unwrap(),
+        })),
+        Err(_error) => {
+            dbg!(_error);
+            Err(AppError::BadRequest)
+        }
+    }
+}
+
+//Update one material object to a project system
+pub async fn remove_project_material(
+    Path(_id): Path<String>,
+    State(state): State<AppState>,
+    Json(input): Json<MaterialWithSysIndicator>,
+) -> Result<Json<DocResponse<UpdatedMaterials>>, AppError> {
+    let oid = parse_oid(_id)?;
+    match projects::remove_material(&state.db, oid, input).await {
+        Ok(_project_doc) => Ok(Json(DocResponse {
+            message: "success".to_string(),
+            data: _project_doc.unwrap(),
+        })),
+        Err(_error) => {
+            dbg!(_error);
+            Err(AppError::BadRequest)
+        }
     }
 }

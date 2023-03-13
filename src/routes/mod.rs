@@ -10,7 +10,8 @@ use self::{
     },
     projects::{
         delete_project, get_all_projects, get_one_project, get_one_project_with_materials,
-        insert_project, update_project,
+        insert_project, insert_project_material, remove_project_material, update_project,
+        update_project_material,
     },
     users::{get_all_users, get_me, get_one_user, update_me, update_user},
 };
@@ -32,6 +33,18 @@ pub async fn create_routes(appstate: AppState) -> Router {
     tracing_subscriber::fmt::init();
     Router::new()
         .route("/api/v1/projects/:id", delete(delete_project))
+        .route(
+            "/api/v1/projects/removematerial/:id",
+            patch(remove_project_material),
+        )
+        .route(
+            "/api/v1/projects/editmaterial/:id",
+            patch(update_project_material),
+        )
+        .route(
+            "/api/v1/projects/addmaterial/:id",
+            patch(insert_project_material),
+        )
         .route("/api/v1/projects/:id", patch(update_project))
         .route("/api/v1/projects", post(insert_project))
         .route(

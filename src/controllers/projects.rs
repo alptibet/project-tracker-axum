@@ -10,8 +10,9 @@ use mongodb::{
 };
 
 use crate::models::projects::{
-    DeletedProject, ProjectDocumentToDelete, ProjectDocumentWithMaterials,
-    ProjectDocumentWithoutMaterials, ProjectInput, ProjectWithMaterials, ProjectWithoutMaterials,
+    DeletedProject, MaterialWithSysIndicator, ProjectDocumentToDelete,
+    ProjectDocumentWithMaterials, ProjectDocumentWithoutMaterials, ProjectInput,
+    ProjectWithMaterials, ProjectWithoutMaterials, UpdatedMaterials, UpdatedMaterialsDocument,
 };
 
 pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<ProjectWithoutMaterials>> {
@@ -73,6 +74,7 @@ pub async fn get_one_with_materials(
     oid: ObjectId,
 ) -> mongodb::error::Result<Option<ProjectWithMaterials>> {
     let collection = db.collection::<ProjectDocumentWithMaterials>("projects");
+
     let project_doc = collection.find_one(doc! {"_id": oid}, None).await?;
     if project_doc.is_none() {
         return Ok(None);
@@ -98,7 +100,7 @@ pub async fn get_one_with_materials(
 pub async fn insert_one(
     db: &Database,
     input: Json<ProjectInput>,
-) -> mongodb::error::Result<ProjectWithoutMaterials> {
+) -> mongodb::error::Result<ProjectWithMaterials> {
     let collection = db.collection::<Document>("projects");
     let chrono_dt: chrono::DateTime<Utc> = input.startDate.parse().unwrap();
     let start_date: bson::DateTime = chrono_dt.into();
@@ -109,7 +111,7 @@ pub async fn insert_one(
 
     let result = collection.insert_one(project_doc, None).await?;
 
-    let project_json = ProjectWithoutMaterials {
+    let project_json = ProjectWithMaterials {
         _id: result.inserted_id.as_object_id().unwrap().to_string(),
         name: input.name.to_string(),
         address: input.address.clone(),
@@ -185,6 +187,105 @@ pub async fn delete_one(
         _id: unwrapped_doc._id.to_string(),
         name: unwrapped_doc.name,
         contractor: unwrapped_doc.contractor,
+    };
+    Ok(Some(project_json))
+}
+
+pub async fn insert_material(
+    db: &Database,
+    oid: ObjectId,
+    input: MaterialWithSysIndicator,
+) -> mongodb::error::Result<Option<UpdatedMaterials>> {
+    dbg!(&input);
+    let collection = db.collection::<UpdatedMaterialsDocument>("projects");
+    let query = doc! {"_id":oid, "systems.name":input.system};
+    let update = doc! {"$push":{"systems.$.materials":{"brand":input.brand, "partNumber":input.partNumber, "qty":input.qty}}};
+
+    let update_options = FindOneAndUpdateOptions::builder()
+        .return_document(ReturnDocument::After)
+        .build();
+
+    let project_doc = collection
+        .find_one_and_update(query, update, update_options)
+        .await?;
+
+    if project_doc.is_none() {
+        return Ok(None);
+    };
+
+    let unwrapped_doc = project_doc.unwrap();
+    let project_json = UpdatedMaterials {
+        _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name,
+        systems: unwrapped_doc.systems,
+    };
+    Ok(Some(project_json))
+}
+
+pub async fn update_material(
+    db: &Database,
+    oid: ObjectId,
+    input: MaterialWithSysIndicator,
+) -> mongodb::error::Result<Option<UpdatedMaterials>> {
+    let collection = db.collection::<UpdatedMaterialsDocument>("projects");
+    let query = doc! {"_id":oid, "systems.name":input.system};
+
+    let pull_update = doc! {"$pull":{"systems.$.materials":{"partNumber":&input.partNumber}}};
+
+    let push_update = doc! {"$push":{"systems.$.materials":{"brand":&input.brand, "partNumber":&input.partNumber, "qty":&input.qty}}};
+
+    let update_options = FindOneAndUpdateOptions::builder()
+        .return_document(ReturnDocument::After)
+        .build();
+
+    collection
+        .find_one_and_update(query.clone(), pull_update, None)
+        .await?;
+
+    let project_doc = collection
+        .find_one_and_update(query, push_update, update_options)
+        .await?;
+
+    if project_doc.is_none() {
+        return Ok(None);
+    };
+
+    let unwrapped_doc = project_doc.unwrap();
+    let project_json = UpdatedMaterials {
+        _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name,
+        systems: unwrapped_doc.systems,
+    };
+    Ok(Some(project_json))
+}
+
+pub async fn remove_material(
+    db: &Database,
+    oid: ObjectId,
+    input: MaterialWithSysIndicator,
+) -> mongodb::error::Result<Option<UpdatedMaterials>> {
+    dbg!(&input);
+    let collection = db.collection::<UpdatedMaterialsDocument>("projects");
+    let query = doc! {"_id":oid, "systems.name":input.system};
+    let update = doc! {"$pull":{"systems.$.materials":{"partNumber":&input.partNumber}}};
+
+    let update_options = FindOneAndUpdateOptions::builder()
+        .return_document(ReturnDocument::After)
+        .build();
+
+    let project_doc = collection
+        .find_one_and_update(query, update, update_options)
+        .await?;
+
+    if project_doc.is_none() {
+        return Ok(None);
+    };
+
+    let unwrapped_doc = project_doc.unwrap();
+    let project_json = UpdatedMaterials {
+        _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name,
+        systems: unwrapped_doc.systems,
     };
     Ok(Some(project_json))
 }
