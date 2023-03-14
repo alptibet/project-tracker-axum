@@ -16,7 +16,7 @@ pub async fn get_all_projects(
 ) -> Result<Json<VecResponse<ProjectWithoutMaterials>>, AppError> {
     match projects::get_all(&state.db).await {
         Ok(_projects_doc) => Ok(Json(VecResponse {
-            message: "Success".to_string(),
+            status: "Success".to_string(),
             data: _projects_doc,
         })),
         Err(_error) => Err(AppError::BadRequest),
@@ -35,7 +35,7 @@ pub async fn get_one_project(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                message: "success".to_string(),
+                status: "success".to_string(),
                 data: _project_doc.unwrap(),
             }))
         }
@@ -55,7 +55,7 @@ pub async fn get_one_project_with_materials(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                message: "success".to_string(),
+                status: "success".to_string(),
                 data: _project_doc.unwrap(),
             }))
         }
@@ -73,7 +73,7 @@ pub async fn insert_project(
 ) -> Result<Json<DocResponse<ProjectWithMaterials>>, AppError> {
     match projects::insert_one(&state.db, Json(input)).await {
         Ok(_project_doc) => Ok(Json(DocResponse {
-            message: "Success".to_string(),
+            status: "Success".to_string(),
             data: _project_doc,
         })),
         Err(_error) => {
@@ -100,7 +100,7 @@ pub async fn update_project(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                message: "success".to_string(),
+                status: "success".to_string(),
                 data: _project_doc.unwrap(),
             }))
         }
@@ -125,7 +125,7 @@ pub async fn delete_project(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                message: "success".to_string(),
+                status: "success".to_string(),
                 data: _project_doc.unwrap(),
             }))
         }
@@ -142,7 +142,7 @@ pub async fn insert_project_material(
     let oid = parse_oid(_id)?;
     match projects::insert_material(&state.db, oid, input).await {
         Ok(_project_doc) => Ok(Json(DocResponse {
-            message: "success".to_string(),
+            status: "success".to_string(),
             data: _project_doc.unwrap(),
         })),
         Err(_error) => {
@@ -161,7 +161,7 @@ pub async fn update_project_material(
     let oid = parse_oid(_id)?;
     match projects::update_material(&state.db, oid, input).await {
         Ok(_project_doc) => Ok(Json(DocResponse {
-            message: "success".to_string(),
+            status: "success".to_string(),
             data: _project_doc.unwrap(),
         })),
         Err(_error) => {
@@ -180,7 +180,7 @@ pub async fn remove_project_material(
     let oid = parse_oid(_id)?;
     match projects::remove_material(&state.db, oid, input).await {
         Ok(_project_doc) => Ok(Json(DocResponse {
-            message: "success".to_string(),
+            status: "success".to_string(),
             data: _project_doc.unwrap(),
         })),
         Err(_error) => {

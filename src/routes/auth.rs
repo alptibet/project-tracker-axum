@@ -25,7 +25,7 @@ pub async fn signup(
                 Err(_error) => (),
             }
             Ok(Json(MessageResponse {
-                message: "success".to_string(),
+                status: "success".to_string(),
             }))
         }
         Err(_error) => {
@@ -61,7 +61,7 @@ pub async fn login(
             if _match {
                 cookies.add(auth::create_send_token(&auth_unwrapped._id));
                 Ok(Json(MessageResponse {
-                    message: "Logged in successfully".to_string(),
+                    status: "Logged in successfully".to_string(),
                 }))
             } else {
                 Err(AppError::WrongCredentials)

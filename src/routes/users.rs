@@ -12,7 +12,7 @@ pub async fn get_all_users(
 ) -> Result<Json<VecResponse<User>>, AppError> {
     match users::get_all(&state.db).await {
         Ok(_users_doc) => Ok(Json(VecResponse {
-            message: "Success".to_string(),
+            status: "Success".to_string(),
             data: _users_doc,
         })),
         Err(_error) => Err(AppError::BadRequest),
@@ -30,7 +30,7 @@ pub async fn get_one_user(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                message: "success".to_string(),
+                status: "success".to_string(),
                 data: _user_doc.unwrap(),
             }))
         }
@@ -50,7 +50,7 @@ pub async fn update_user(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                message: "success".to_string(),
+                status: "success".to_string(),
                 data: _user_doc.unwrap(),
             }))
         }
@@ -78,7 +78,7 @@ pub async fn get_me(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                message: "success".to_string(),
+                status: "success".to_string(),
                 data: _user_doc.unwrap(),
             }))
         }
@@ -98,7 +98,7 @@ pub async fn update_me(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                message: "success".to_string(),
+                status: "success".to_string(),
                 data: _user_doc.unwrap(),
             }))
         }

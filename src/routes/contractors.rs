@@ -11,7 +11,7 @@ pub async fn get_all_contractors(
 ) -> Result<Json<VecResponse<Contractor>>, AppError> {
     match contractors::get_all(&state.db).await {
         Ok(_contractors_doc) => Ok(Json(VecResponse {
-            message: "Success".to_string(),
+            status: "Success".to_string(),
             data: _contractors_doc,
         })),
         Err(_error) => Err(AppError::NotFound),
@@ -29,7 +29,7 @@ pub async fn get_one_contractor(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                message: "Success".to_string(),
+                status: "Success".to_string(),
                 data: _contractor_doc.unwrap(),
             }))
         }
@@ -43,7 +43,7 @@ pub async fn insert_contractor(
 ) -> Result<Json<DocResponse<Contractor>>, AppError> {
     match contractors::insert_one(&state.db, Json(input)).await {
         Ok(_contractor_doc) => Ok(Json(DocResponse {
-            message: "Success".to_string(),
+            status: "Success".to_string(),
             data: _contractor_doc,
         })),
         Err(_error) => {
@@ -67,7 +67,7 @@ pub async fn delete_contractor(
                 return Err(AppError::NotFound);
             }
             Ok(Json(MessageResponse {
-                message: "Success".to_string(),
+                status: "Success".to_string(),
             }))
         }
         Err(_error) => Err(AppError::InternalServerError),
@@ -86,7 +86,7 @@ pub async fn update_contractor(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                message: "Success".to_string(),
+                status: "Success".to_string(),
                 data: _contractor_doc.unwrap(),
             }))
         }
