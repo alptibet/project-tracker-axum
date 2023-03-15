@@ -9,20 +9,21 @@ use axum::{
 use mongodb::bson::{oid::ObjectId, DateTime};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use validator::Validate;
+use validator::{Validate, ValidationError};
 
 #[derive(Deserialize, Serialize)]
 pub enum Scope {
-    Design(String),
-    Installation(String),
-    Commissioning(String),
+    Design,
+    Installation,
+    Commissioning,
+    Nothing,
 }
 
 #[derive(Deserialize, Serialize)]
 pub enum SystemName {
-    Fire(String),
-    Public(String),
-    Hvac(String),
+    Fire,
+    Public,
+    Hvac,
 }
 
 #[allow(non_snake_case)]
@@ -42,7 +43,7 @@ pub struct MaterialWithSysIndicator {
     pub system: String,
 }
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct SystemWithMaterials {
     pub name: String,
     pub scope: Vec<String>,
@@ -160,6 +161,7 @@ pub struct ProjectInput {
     pub completionDate: String,
     #[validate(required(message = "Project must have a contractor"))]
     pub contractor: Option<String>,
+    #[validate(custom = "validate_system")]
     pub systems: Vec<SystemWithMaterials>,
 }
 
@@ -185,4 +187,33 @@ where
         }
         Ok(project)
     }
+}
+
+//Could not use Enum variants in this function, why? Ugly
+fn validate_system(systems: &[SystemWithMaterials]) -> Result<(), ValidationError> {
+    let mut validated: bool = false;
+    'outer: for system in systems {
+        let result = matches!(system.name.as_str(), "Fire" | "Hvac" | "Public");
+        if !result {
+            validated = false;
+            break;
+        }
+        validated = true;
+
+        let scope = &system.scope;
+        for item in scope {
+            let result = matches!(item.as_str(), "Design" | "Installation" | "Commissioning");
+            if !result {
+                validated = false;
+                break 'outer;
+            }
+            validated = true;
+        }
+    }
+
+    if validated {
+        return Ok(());
+    }
+
+    Err(ValidationError::new("DENEME"))
 }
