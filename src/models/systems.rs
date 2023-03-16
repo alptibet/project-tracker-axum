@@ -18,7 +18,7 @@ pub struct System {
 //Still could not figure out how to use if input is not of any of these
 #[derive(Deserialize, Serialize, Clone)]
 pub enum Scope {
-    Design(String),
-    Installation(String),
-    Commissioning(String),
+    Design,
+    Installation,
+    Commissioning
 }
