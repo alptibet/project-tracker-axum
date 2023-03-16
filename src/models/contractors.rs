@@ -11,13 +11,13 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use validator::Validate;
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize)]
 pub struct Contractor {
     pub _id: String,
     pub name: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize)]
 pub struct ContractorDocument {
     pub _id: ObjectId,
     pub name: String,

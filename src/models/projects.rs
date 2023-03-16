@@ -11,23 +11,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use validator::{Validate, ValidationError};
 
-#[derive(Deserialize, Serialize)]
-pub enum Scope {
-    Design,
-    Installation,
-    Commissioning,
-    Nothing,
-}
-
-#[derive(Deserialize, Serialize)]
-pub enum SystemName {
-    Fire,
-    Public,
-    Hvac,
-}
-
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Material {
     pub partNumber: String,
     pub brand: String,
@@ -35,7 +20,7 @@ pub struct Material {
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct MaterialWithSysIndicator {
     pub partNumber: String,
     pub brand: String,
@@ -43,14 +28,14 @@ pub struct MaterialWithSysIndicator {
     pub system: String,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct SystemWithMaterials {
     pub name: String,
     pub scope: Vec<String>,
     pub materials: Vec<Material>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct SystemWithoutMaterials {
     pub name: String,
     pub scope: Vec<String>,

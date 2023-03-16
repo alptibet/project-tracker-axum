@@ -34,7 +34,7 @@ pub struct UserId {
 }
 
 #[allow(non_snake_case)]
-#[derive(Deserialize, Validate, Debug)]
+#[derive(Deserialize, Validate)]
 pub struct UserInput {
     pub name: String,
     pub surname: String,

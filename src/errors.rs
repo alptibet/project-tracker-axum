@@ -6,7 +6,7 @@ use axum::{
 use serde::Serialize;
 use serde_json::json;
 
-#[derive(Debug, Serialize)]
+#[derive(Serialize)]
 pub enum AppError {
     NoAuth,
     NotAuthorized,

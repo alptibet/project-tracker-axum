@@ -196,7 +196,6 @@ pub async fn insert_material(
     oid: ObjectId,
     input: MaterialWithSysIndicator,
 ) -> mongodb::error::Result<Option<UpdatedMaterials>> {
-    dbg!(&input);
     let collection = db.collection::<UpdatedMaterialsDocument>("projects");
     let query = doc! {"_id":oid, "systems.name":input.system};
     let update = doc! {"$push":{"systems.$.materials":{"brand":input.brand, "partNumber":input.partNumber, "qty":input.qty}}};
@@ -264,7 +263,6 @@ pub async fn remove_material(
     oid: ObjectId,
     input: MaterialWithSysIndicator,
 ) -> mongodb::error::Result<Option<UpdatedMaterials>> {
-    dbg!(&input);
     let collection = db.collection::<UpdatedMaterialsDocument>("projects");
     let query = doc! {"_id":oid, "systems.name":input.system};
     let update = doc! {"$pull":{"systems.$.materials":{"partNumber":&input.partNumber}}};

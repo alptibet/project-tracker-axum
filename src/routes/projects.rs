@@ -59,10 +59,7 @@ pub async fn get_one_project_with_materials(
                 data: _project_doc.unwrap(),
             }))
         }
-        Err(_error) => {
-            dbg!(_error);
-            Err(AppError::BadRequest)
-        }
+        Err(_error) => Err(AppError::BadRequest),
     }
 }
 
@@ -145,10 +142,7 @@ pub async fn insert_project_material(
             status: "success".to_string(),
             data: _project_doc.unwrap(),
         })),
-        Err(_error) => {
-            dbg!(_error);
-            Err(AppError::BadRequest)
-        }
+        Err(_error) => Err(AppError::BadRequest),
     }
 }
 
@@ -164,10 +158,7 @@ pub async fn update_project_material(
             status: "success".to_string(),
             data: _project_doc.unwrap(),
         })),
-        Err(_error) => {
-            dbg!(_error);
-            Err(AppError::BadRequest)
-        }
+        Err(_error) => Err(AppError::BadRequest),
     }
 }
 
@@ -183,9 +174,6 @@ pub async fn remove_project_material(
             status: "success".to_string(),
             data: _project_doc.unwrap(),
         })),
-        Err(_error) => {
-            dbg!(_error);
-            Err(AppError::BadRequest)
-        }
+        Err(_error) => Err(AppError::BadRequest),
     }
 }
