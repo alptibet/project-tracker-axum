@@ -193,8 +193,8 @@ where
 fn validate_system(systems: &[SystemWithMaterials]) -> Result<(), ValidationError> {
     let mut validated: bool = false;
     'outer: for system in systems {
-        let result = matches!(system.name.as_str(), "Fire" | "Hvac" | "Public");
-        if !result {
+        let name = matches!(system.name.as_str(), "Fire" | "Hvac" | "Public");
+        if !name {
             validated = false;
             break;
         }
@@ -215,5 +215,5 @@ fn validate_system(systems: &[SystemWithMaterials]) -> Result<(), ValidationErro
         return Ok(());
     }
 
-    Err(ValidationError::new("DENEME"))
+    Err(ValidationError::new("System validation error"))
 }
