@@ -3,14 +3,13 @@ use mongodb::{Client, Database};
 use std::env;
 
 pub async fn init_db() -> Database {
-    let db = match connect().await {
+    match connect().await {
         Ok(_database) => _database,
         Err(_error) => {
             eprintln!("Error connecting to database: {_error:?}");
             panic!();
         }
-    };
-    db
+    }
 }
 
 async fn connect() -> mongodb::error::Result<Database> {

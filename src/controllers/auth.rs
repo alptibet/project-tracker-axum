@@ -126,14 +126,10 @@ async fn is_valid_user(db: &Database, token: Option<String>) -> Option<ValidUser
 
     if let Ok(_payload) = payload {
         let oid = parse_oid(_payload.claims.sub).unwrap();
-        let valid_user = match match_user(db, oid).await {
-            Ok(_valid_user) => {
-                _valid_user.as_ref()?;
-                return _valid_user;
-            }
+        match match_user(db, oid).await {
+            Ok(_valid_user) => _valid_user,
             Err(_err) => None,
-        };
-        valid_user
+        }
     } else {
         None
     }

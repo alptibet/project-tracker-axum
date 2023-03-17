@@ -46,7 +46,11 @@ pub async fn insert_one(db: &Database, input: Json<SystemInput>) -> mongodb::err
     let insert_one_result = collection.insert_one(system_document, None).await?;
     let system_name = &input.name.to_string();
     let system_json = System {
-        _id: insert_one_result.inserted_id.to_string(),
+        _id: insert_one_result
+            .inserted_id
+            .as_object_id()
+            .unwrap()
+            .to_string(),
         name: system_name.to_string(),
     };
     Ok(system_json)
