@@ -1,6 +1,7 @@
 mod auth;
 mod contractors;
 mod projects;
+mod systems;
 mod users;
 use self::{
     auth::{login, logout, signup},
@@ -14,6 +15,7 @@ use self::{
         update_project_material,
     },
     users::{get_all_users, get_me, get_one_user, update_me, update_user},
+    systems::{get_all_systems, update_system, delete_system, insert_system, get_one_system}
 };
 
 use crate::{
@@ -32,6 +34,11 @@ use tower_http::trace::TraceLayer;
 pub async fn create_routes(appstate: AppState) -> Router {
     tracing_subscriber::fmt::init();
     Router::new()
+        .route("/api/v1/systems", get(get_all_systems))
+        .route("/api/v1/systems/:id", get(get_one_system))
+        .route("/api/v1/systems", post(insert_system))
+        .route("/api/v1/systems/:id", delete(delete_system))
+        .route("/api/v1/systems/:id", patch(update_system))
         .route("/api/v1/projects/:id", delete(delete_project))
         .route(
             "/api/v1/projects/removematerial/:id",

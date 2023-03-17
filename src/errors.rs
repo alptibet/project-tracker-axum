@@ -6,12 +6,12 @@ use axum::{
 use serde::Serialize;
 use serde_json::json;
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub enum AppError {
     NoAuth,
     NotAuthorized,
     WrongCredentials,
-    InternalServerError,
+    // InternalServerError,
     UserDoesNotExist,
     UserAlreadyExists,
     EmailAlreadyExists,
@@ -28,7 +28,7 @@ impl IntoResponse for AppError {
             Self::OidParseError => (StatusCode::BAD_REQUEST, "Cannot parse oid"),
             Self::NotFound => (StatusCode::NOT_FOUND, "Requested resource does not exist"),
             Self::DuplicateRecord => (StatusCode::BAD_REQUEST, "Duplicate record found"),
-            Self::InternalServerError => (StatusCode::BAD_REQUEST, "Something went wrong"),
+            // Self::InternalServerError => (StatusCode::BAD_REQUEST, "Something went wrong"),
             Self::BadRequest => (StatusCode::BAD_REQUEST, "Unable to complete request"),
             Self::UserDoesNotExist => (StatusCode::BAD_REQUEST, "User does not exist"),
             Self::UserNotActive => (StatusCode::FORBIDDEN, "Your account is not active"),

@@ -42,8 +42,8 @@ where
 {
     type Rejection = (StatusCode, Json<Value>);
     async fn from_request(req: Request<B>, _state: &S) -> Result<Self, Self::Rejection> {
-        let Json(user) = req.extract::<Json<ContractorInput>, _>().await.unwrap();
-        if let Err(errors) = user.validate() {
+        let Json(contractor) = req.extract::<Json<ContractorInput>, _>().await.unwrap();
+        if let Err(errors) = contractor.validate() {
             return Err((
                 StatusCode::BAD_REQUEST,
                 Json(json!({
@@ -52,6 +52,6 @@ where
                 })),
             ));
         }
-        Ok(user)
+        Ok(contractor)
     }
 }

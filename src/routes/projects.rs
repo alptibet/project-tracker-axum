@@ -15,9 +15,9 @@ pub async fn get_all_projects(
     State(state): State<AppState>,
 ) -> Result<Json<VecResponse<ProjectWithoutMaterials>>, AppError> {
     match projects::get_all(&state.db).await {
-        Ok(_projects_doc) => Ok(Json(VecResponse {
+        Ok(projects_doc) => Ok(Json(VecResponse {
             status: "Success".to_string(),
-            data: _projects_doc,
+            data: projects_doc,
         })),
         Err(_error) => Err(AppError::BadRequest),
     }
@@ -30,13 +30,13 @@ pub async fn get_one_project(
 ) -> Result<Json<DocResponse<ProjectWithoutMaterials>>, AppError> {
     let oid = parse_oid(_id)?;
     match projects::get_one(&state.db, oid).await {
-        Ok(_project_doc) => {
-            if _project_doc.is_none() {
+        Ok(project_doc) => {
+            if project_doc.is_none() {
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
                 status: "success".to_string(),
-                data: _project_doc.unwrap(),
+                data: project_doc.unwrap(),
             }))
         }
         Err(_error) => Err(AppError::BadRequest),
@@ -50,13 +50,13 @@ pub async fn get_one_project_with_materials(
 ) -> Result<Json<DocResponse<ProjectWithMaterials>>, AppError> {
     let oid = parse_oid(_id)?;
     match projects::get_one_with_materials(&state.db, oid).await {
-        Ok(_project_doc) => {
-            if _project_doc.is_none() {
+        Ok(project_doc) => {
+            if project_doc.is_none() {
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
                 status: "success".to_string(),
-                data: _project_doc.unwrap(),
+                data: project_doc.unwrap(),
             }))
         }
         Err(_error) => Err(AppError::BadRequest),
@@ -69,12 +69,12 @@ pub async fn insert_project(
     input: ProjectInput,
 ) -> Result<Json<DocResponse<ProjectWithMaterials>>, AppError> {
     match projects::insert_one(&state.db, Json(input)).await {
-        Ok(_project_doc) => Ok(Json(DocResponse {
+        Ok(project_doc) => Ok(Json(DocResponse {
             status: "Success".to_string(),
-            data: _project_doc,
+            data: project_doc,
         })),
-        Err(_error) => {
-            let res = _error.to_string();
+        Err(error) => {
+            let res = error.to_string();
             println!("{res:?}");
             if res.contains("code: 11000") {
                 return Err(AppError::DuplicateRecord);
@@ -92,13 +92,13 @@ pub async fn update_project(
 ) -> Result<Json<DocResponse<ProjectWithoutMaterials>>, AppError> {
     let oid = parse_oid(_id)?;
     match projects::update_one(&state.db, oid, Json(input)).await {
-        Ok(_project_doc) => {
-            if _project_doc.is_none() {
+        Ok(project_doc) => {
+            if project_doc.is_none() {
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
                 status: "success".to_string(),
-                data: _project_doc.unwrap(),
+                data: project_doc.unwrap(),
             }))
         }
         Err(_error) => {
@@ -117,13 +117,13 @@ pub async fn delete_project(
 ) -> Result<Json<DocResponse<DeletedProject>>, AppError> {
     let oid = parse_oid(_id)?;
     match projects::delete_one(&state.db, oid).await {
-        Ok(_project_doc) => {
-            if _project_doc.is_none() {
+        Ok(project_doc) => {
+            if project_doc.is_none() {
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
                 status: "success".to_string(),
-                data: _project_doc.unwrap(),
+                data: project_doc.unwrap(),
             }))
         }
         Err(_error) => Err(AppError::BadRequest),
@@ -138,9 +138,9 @@ pub async fn insert_project_material(
 ) -> Result<Json<DocResponse<UpdatedMaterials>>, AppError> {
     let oid = parse_oid(_id)?;
     match projects::insert_material(&state.db, oid, input).await {
-        Ok(_project_doc) => Ok(Json(DocResponse {
+        Ok(project_doc) => Ok(Json(DocResponse {
             status: "success".to_string(),
-            data: _project_doc.unwrap(),
+            data: project_doc.unwrap(),
         })),
         Err(_error) => Err(AppError::BadRequest),
     }
@@ -154,9 +154,9 @@ pub async fn update_project_material(
 ) -> Result<Json<DocResponse<UpdatedMaterials>>, AppError> {
     let oid = parse_oid(_id)?;
     match projects::update_material(&state.db, oid, input).await {
-        Ok(_project_doc) => Ok(Json(DocResponse {
+        Ok(project_doc) => Ok(Json(DocResponse {
             status: "success".to_string(),
-            data: _project_doc.unwrap(),
+            data: project_doc.unwrap(),
         })),
         Err(_error) => Err(AppError::BadRequest),
     }
@@ -170,9 +170,9 @@ pub async fn remove_project_material(
 ) -> Result<Json<DocResponse<UpdatedMaterials>>, AppError> {
     let oid = parse_oid(_id)?;
     match projects::remove_material(&state.db, oid, input).await {
-        Ok(_project_doc) => Ok(Json(DocResponse {
+        Ok(project_doc) => Ok(Json(DocResponse {
             status: "success".to_string(),
-            data: _project_doc.unwrap(),
+            data: project_doc.unwrap(),
         })),
         Err(_error) => Err(AppError::BadRequest),
     }
