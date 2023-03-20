@@ -18,6 +18,7 @@ pub async fn get_all(db: &Database) -> mongodb::error::Result<Vec<Material>> {
             _id: result._id.to_string(),
             brand: result.brand,
             partNumber: result.partNumber,
+            matType: result.matType,
             description: result.description,
         };
         materials.push(materials_json);
@@ -39,6 +40,7 @@ pub async fn get_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Opt
         _id: unwrapped_doc._id.to_string(),
         brand: unwrapped_doc.brand,
         partNumber: unwrapped_doc.partNumber,
+        matType: unwrapped_doc.matType,
         description: unwrapped_doc.description,
     };
 
@@ -50,7 +52,7 @@ pub async fn insert_one(
     input: Json<MaterialInput>,
 ) -> mongodb::error::Result<Material> {
     let collection = db.collection::<Document>("materials");
-    let material_document = doc! {"brand": &input.brand, "partNumber": &input.partNumber, "description": &input.description};
+    let material_document = doc! {"brand": &input.brand, "partNumber": &input.partNumber, "matType":&input.matType, "description": &input.description};
     let insert_one_result = collection.insert_one(material_document, None).await?;
 
     let material_json = Material {
@@ -61,6 +63,7 @@ pub async fn insert_one(
             .to_string(),
         brand: input.brand.clone().unwrap(),
         partNumber: input.partNumber.clone().unwrap(),
+        matType: input.matType.clone(),
         description: input.description.to_string(),
     };
     Ok(material_json)
@@ -90,7 +93,7 @@ pub async fn update_one(
     let material_doc = collection
         .find_one_and_update(
             doc! {"_id": oid},
-            doc! {"$set": {"brand": &input.brand, "partNumber": &input.partNumber, "description": &input.description}},
+            doc! {"$set": {"brand": &input.brand, "partNumber": &input.partNumber, "matType":&input.matType, "description": &input.description}},
             update_options,
         )
         .await?;
@@ -103,6 +106,7 @@ pub async fn update_one(
         _id: unwrapped_doc._id.to_string(),
         brand: unwrapped_doc.brand,
         partNumber: unwrapped_doc.partNumber,
+        matType: unwrapped_doc.matType,
         description: unwrapped_doc.description,
     };
 

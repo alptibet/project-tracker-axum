@@ -51,7 +51,11 @@ pub async fn insert_one(
     let insert_one_result = collection.insert_one(contractor_document, None).await?;
     let contractor_name = &input.name.to_string();
     let contractor_json = Contractor {
-        _id: insert_one_result.inserted_id.to_string(),
+        _id: insert_one_result
+            .inserted_id
+            .as_object_id()
+            .unwrap()
+            .to_string(),
         name: contractor_name.to_string(),
     };
     Ok(contractor_json)

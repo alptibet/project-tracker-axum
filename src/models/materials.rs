@@ -17,6 +17,7 @@ pub struct MaterialDocument {
     pub _id: ObjectId,
     pub brand: String,
     pub partNumber: String,
+    pub matType: String,
     pub description: String,
 }
 
@@ -26,6 +27,7 @@ pub struct Material {
     pub _id: String,
     pub brand: String,
     pub partNumber: String,
+    pub matType: String,
     pub description: String,
 }
 
@@ -36,6 +38,7 @@ pub struct MaterialInput {
     pub brand: Option<String>,
     #[validate(required(message = "Material must have part number"))]
     pub partNumber: Option<String>,
+    pub matType: String,
     pub description: String,
 }
 
