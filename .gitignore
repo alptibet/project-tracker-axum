@@ -1,3 +1,3 @@
-/target
+/backend/target
 .env
 .DS_Store
