@@ -1,3 +1,7 @@
 /backend/target
-.env
-.DS_Store
+**/.env
+**/.env.*
+**/.DS_Store
+**/node_modules
+**/dist
+**/.vscode

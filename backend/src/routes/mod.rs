@@ -27,16 +27,29 @@ use crate::{
     controllers::auth::{authenticate_user, authorize_admin},
 };
 use axum::{
+    http::{
+        header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
+        Method,
+    },
     middleware,
     routing::{delete, get, patch, post},
     Router,
 };
 
 use tower_cookies::CookieManagerLayer;
-use tower_http::trace::TraceLayer;
+use tower_http::{
+    cors::{Any, CorsLayer},
+    trace::TraceLayer,
+};
 
 pub async fn create_routes(appstate: AppState) -> Router {
+    let cors = CorsLayer::new()
+        .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
+        .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE])
+        .allow_origin(Any);
+
     tracing_subscriber::fmt::init();
+
     Router::new()
         .route("/api/v1/materials", get(get_all_materials))
         .route("/api/v1/materials/:id", get(get_one_material))
@@ -87,6 +100,7 @@ pub async fn create_routes(appstate: AppState) -> Router {
         .route("/api/v1/signup", post(signup))
         .route("/api/v1/login", post(login))
         .with_state(appstate)
+        .layer(cors)
         .layer(CookieManagerLayer::new())
         .layer(TraceLayer::new_for_http())
 }
