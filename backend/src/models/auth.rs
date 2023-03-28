@@ -8,6 +8,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use typeshare::typeshare;
 use validator::Validate;
 
 #[derive(Deserialize, Serialize)]
@@ -16,6 +17,7 @@ pub struct Claims {
     pub exp: usize,
 }
 
+#[typeshare]
 #[derive(Deserialize, Serialize, Validate)]
 pub struct UserLogin {
     pub username: String,
