@@ -1,7 +1,7 @@
 use crate::{appstate::AppState, db::init_db, routes::create_routes};
 
 pub async fn run_app() {
-    let addr = std::net::SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], 3000));
     println!("Server started on {addr}");
     let db = init_db().await;
     let appstate = AppState { db };

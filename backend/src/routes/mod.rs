@@ -29,7 +29,7 @@ use crate::{
 use axum::{
     http::{
         header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
-        HeaderValue, Method,
+        Method,
     },
     middleware,
     routing::{delete, get, patch, post},
@@ -46,8 +46,7 @@ pub async fn create_routes(appstate: AppState) -> Router {
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
         .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE])
-        .allow_credentials(true)
-        .allow_origin("http://localhost:5174".parse::<HeaderValue>().unwrap());
+        .allow_origin(Any);
 
     tracing_subscriber::fmt::init();
 

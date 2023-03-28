@@ -1,6 +1,7 @@
 <script lang="ts">
   import axios from 'axios';
   import type { UserLogin } from '../types';
+
   const login = async () => {
     const data: UserLogin = {
       username: 'alptibet',
