@@ -46,7 +46,7 @@ impl IntoResponse for AppError {
         };
         (
             status,
-            Json(json!({"status":"Failure", "message": err_msg })),
+            Json(json!({"status":"failure", "message": err_msg })),
         )
             .into_response()
     }

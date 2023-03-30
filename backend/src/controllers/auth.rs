@@ -113,9 +113,12 @@ pub async fn authenticate_user<B>(
     if let Some(_auth_bearer) = auth_bearer {
         let bearer: Vec<&str> = auth_bearer.unwrap().to_str().unwrap().split(' ').collect();
         token = Some(bearer[1].to_string());
+    } else if let Some(cookie) = cookies.unwrap().get("token") {
+        token = Some(cookie.to_string());
     } else {
-        token = Some(cookies.unwrap().get("token").unwrap().to_string());
-    } //Shall we do error handling here?
+        return Err(AppError::NoAuth);
+    }
+
     if let Some(user) = is_valid_user(&state.db, token).await {
         if !user.active {
             return Err(AppError::UserNotActive);
