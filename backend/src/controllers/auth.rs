@@ -1,7 +1,7 @@
 use crate::appstate::AppState;
 use crate::errors::AppError;
-use crate::models::auth::{AuthInfo, Claims};
-use crate::models::users::{UserDocument, UserRole, ValidUser};
+use crate::models::auth::Claims;
+use crate::models::users::{User, UserDocument, UserRole, ValidUser};
 use crate::utils::parse_oid;
 use axum::Extension;
 use axum::{
@@ -28,7 +28,8 @@ pub fn create_send_token<'a>(_id: &str) -> Cookie<'a> {
     let exp = OffsetDateTime::now_utc() + Duration::hours(1);
     Cookie::build("token", sign_token(_id))
         .path("/")
-        .secure(false)
+        .secure(true)
+        .same_site(tower_cookies::cookie::SameSite::None)
         .http_only(true)
         .expires(exp)
         .finish()
@@ -69,7 +70,7 @@ pub fn disable_token<'a>() -> Cookie<'a> {
         .finish()
 }
 
-pub async fn match_auth(db: &Database, username: &str) -> mongodb::error::Result<Option<AuthInfo>> {
+pub async fn match_auth(db: &Database, username: &str) -> mongodb::error::Result<Option<User>> {
     let collection = db.collection::<UserDocument>("users");
     let user_doc = collection
         .find_one(doc! {"username":username}, None)
@@ -78,9 +79,20 @@ pub async fn match_auth(db: &Database, username: &str) -> mongodb::error::Result
         return Ok(None);
     }
     let unwrapped_doc = user_doc.unwrap();
-    let match_auth = AuthInfo {
+    let match_auth = User {
         _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name,
+        surname: unwrapped_doc.surname,
+        username: unwrapped_doc.username,
+        email: unwrapped_doc.email,
+        active: unwrapped_doc.active,
         password: unwrapped_doc.password,
+        passwordChangeAt: unwrapped_doc.passwordChangeAt.to_string(),
+        role: match unwrapped_doc.role {
+            UserRole::Admin => "Admin".to_string(),
+            UserRole::User => "User".to_string(),
+            UserRole::Superuser => "Superuser".to_string(),
+        },
     };
 
     Ok(Some(match_auth))

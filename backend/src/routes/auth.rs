@@ -3,7 +3,10 @@ use crate::controllers::auth;
 use crate::controllers::users;
 use crate::errors::AppError;
 use crate::models::auth::{UserInput, UserLogin};
+use crate::models::response::DocResponse;
 use crate::models::response::MessageResponse;
+
+use crate::models::users::ValidUser;
 use axum::extract::{Json, State};
 use tower_cookies::Cookies;
 
@@ -45,7 +48,7 @@ pub async fn login(
     State(state): State<AppState>,
     cookies: Cookies,
     Json(input): Json<UserLogin>,
-) -> Result<Json<MessageResponse>, AppError> {
+) -> Result<Json<DocResponse<ValidUser>>, AppError> {
     let match_auth = match auth::match_auth(&state.db, &input.username).await {
         Ok(match_auth) => {
             if match_auth.is_none() {
@@ -55,13 +58,23 @@ pub async fn login(
         }
         Err(_error) => Err(AppError::BadRequest),
     };
-    let auth_unwrapped = match_auth.unwrap();
-    match auth::check_password(&input.password, &auth_unwrapped.password) {
+    let user = match_auth.unwrap();
+    match auth::check_password(&input.password, &user.password) {
         Ok(passmatch) => {
             if passmatch {
-                cookies.add(auth::create_send_token(&auth_unwrapped._id));
-                Ok(Json(MessageResponse {
-                    status: "Logged in successfully".to_string(),
+                cookies.add(auth::create_send_token(&user._id));
+                let user_json = ValidUser {
+                    _id: user._id,
+                    name: user.name,
+                    surname: user.surname,
+                    username: user.username,
+                    email: user.email,
+                    active: user.active,
+                    role: user.role,
+                };
+                Ok(Json(DocResponse {
+                    status: "success".to_string(),
+                    data: user_json,
                 }))
             } else {
                 Err(AppError::WrongCredentials)

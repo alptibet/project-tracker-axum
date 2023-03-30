@@ -16,7 +16,7 @@ pub async fn get_all_projects(
 ) -> Result<Json<VecResponse<ProjectWithoutMaterials>>, AppError> {
     match projects::get_all(&state.db).await {
         Ok(projects_doc) => Ok(Json(VecResponse {
-            status: "Success".to_string(),
+            status: "success".to_string(),
             data: projects_doc,
         })),
         Err(_error) => Err(AppError::BadRequest),
@@ -70,7 +70,7 @@ pub async fn insert_project(
 ) -> Result<Json<DocResponse<ProjectWithMaterials>>, AppError> {
     match projects::insert_one(&state.db, Json(input)).await {
         Ok(project_doc) => Ok(Json(DocResponse {
-            status: "Success".to_string(),
+            status: "success".to_string(),
             data: project_doc,
         })),
         Err(error) => {

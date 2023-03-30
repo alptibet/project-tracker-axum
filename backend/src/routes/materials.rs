@@ -13,7 +13,7 @@ pub async fn get_all_materials(
 ) -> Result<Json<VecResponse<Material>>, AppError> {
     match materials::get_all(&state.db).await {
         Ok(material_doc) => Ok(Json(VecResponse {
-            status: "Success".to_string(),
+            status: "success".to_string(),
             data: material_doc,
         })),
         Err(_error) => Err(AppError::NotFound),
@@ -31,7 +31,7 @@ pub async fn get_one_material(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                status: "Success".to_string(),
+                status: "success".to_string(),
                 data: material_doc.unwrap(),
             }))
         }
@@ -45,7 +45,7 @@ pub async fn insert_material(
 ) -> Result<Json<DocResponse<Material>>, AppError> {
     match materials::insert_one(&state.db, Json(input)).await {
         Ok(material_doc) => Ok(Json(DocResponse {
-            status: "Success".to_string(),
+            status: "success".to_string(),
             data: material_doc,
         })),
         Err(_error) => {
@@ -69,7 +69,7 @@ pub async fn delete_material(
                 return Err(AppError::NotFound);
             }
             Ok(Json(MessageResponse {
-                status: "Success".to_string(),
+                status: "success".to_string(),
             }))
         }
         Err(_error) => Err(AppError::BadRequest),
@@ -88,7 +88,7 @@ pub async fn update_material(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                status: "Success".to_string(),
+                status: "success".to_string(),
                 data: material_doc.unwrap(),
             }))
         }

@@ -46,6 +46,7 @@ pub struct UserDocument {
     pub passwordChangeAt: DateTime,
     pub role: UserRole,
 }
+
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ValidUser {
     pub _id: String,
@@ -92,11 +93,6 @@ where
         }
         Ok(user)
     }
-}
-
-#[derive(Deserialize, Serialize)]
-pub struct UserId {
-    pub _id: String,
 }
 
 #[derive(Deserialize, Serialize, Validate)]

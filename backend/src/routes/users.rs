@@ -12,7 +12,7 @@ pub async fn get_all_users(
 ) -> Result<Json<VecResponse<User>>, AppError> {
     match users::get_all(&state.db).await {
         Ok(users_doc) => Ok(Json(VecResponse {
-            status: "Success".to_string(),
+            status: "success".to_string(),
             data: users_doc,
         })),
         Err(_error) => Err(AppError::BadRequest),

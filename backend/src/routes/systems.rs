@@ -29,7 +29,7 @@ pub async fn get_one_system(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                status: "Success".to_string(),
+                status: "success".to_string(),
                 data: system_doc.unwrap(),
             }))
         }
@@ -43,7 +43,7 @@ pub async fn insert_system(
 ) -> Result<Json<DocResponse<System>>, AppError> {
     match systems::insert_one(&state.db, Json(input)).await {
         Ok(_system_doc) => Ok(Json(DocResponse {
-            status: "Success".to_string(),
+            status: "success".to_string(),
             data: _system_doc,
         })),
         Err(_error) => {
@@ -67,7 +67,7 @@ pub async fn delete_system(
                 return Err(AppError::NotFound);
             }
             Ok(Json(MessageResponse {
-                status: "Success".to_string(),
+                status: "success".to_string(),
             }))
         }
         Err(_error) => Err(AppError::BadRequest),
@@ -86,7 +86,7 @@ pub async fn update_system(
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
-                status: "Success".to_string(),
+                status: "success".to_string(),
                 data: system_doc.unwrap(),
             }))
         }
