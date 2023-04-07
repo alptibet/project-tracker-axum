@@ -28,6 +28,13 @@ pub struct MaterialWithSysIndicator {
     pub system: String,
 }
 
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize, Clone)]
+pub struct MaterialToDelete {
+    pub partNumber: String,
+    pub system: String,
+}
+
 #[derive(Deserialize, Serialize, Clone)]
 pub struct SystemWithMaterials {
     pub name: String,

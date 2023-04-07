@@ -2,8 +2,8 @@ use crate::appstate::AppState;
 use crate::controllers::projects;
 use crate::errors::AppError;
 use crate::models::projects::{
-    DeletedProject, MaterialWithSysIndicator, ProjectInput, ProjectUpdate, ProjectWithMaterials,
-    ProjectWithoutMaterials, UpdatedMaterials,
+    DeletedProject, MaterialToDelete, MaterialWithSysIndicator, ProjectInput, ProjectUpdate,
+    ProjectWithMaterials, ProjectWithoutMaterials, UpdatedMaterials,
 };
 use crate::models::response::{DocResponse, VecResponse};
 use crate::utils::parse_oid;
@@ -179,7 +179,7 @@ pub async fn update_project_material(
 pub async fn remove_project_material(
     Path(_id): Path<String>,
     State(state): State<AppState>,
-    Json(input): Json<MaterialWithSysIndicator>,
+    Json(input): Json<MaterialToDelete>,
 ) -> Result<Json<DocResponse<UpdatedMaterials>>, AppError> {
     let oid = parse_oid(_id)?;
     match projects::remove_material(&state.db, oid, input).await {

@@ -10,7 +10,7 @@ use mongodb::{
 };
 
 use crate::models::projects::{
-    DeletedProject, MaterialWithSysIndicator, ProjectDocumentToDelete,
+    DeletedProject, MaterialToDelete, MaterialWithSysIndicator, ProjectDocumentToDelete,
     ProjectDocumentWithMaterials, ProjectDocumentWithoutMaterials, ProjectInput, ProjectUpdate,
     ProjectWithMaterials, ProjectWithoutMaterials, UpdatedMaterials, UpdatedMaterialsDocument,
 };
@@ -260,7 +260,7 @@ pub async fn update_material(
 pub async fn remove_material(
     db: &Database,
     oid: ObjectId,
-    input: MaterialWithSysIndicator,
+    input: MaterialToDelete,
 ) -> mongodb::error::Result<Option<UpdatedMaterials>> {
     let collection = db.collection::<UpdatedMaterialsDocument>("projects");
     let query = doc! {"_id":oid, "systems.name":input.system};
