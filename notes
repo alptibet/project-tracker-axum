@@ -6,3 +6,7 @@ db.projects.updateOne({"name":"PROJECT", "systems.name":"Fire"}, {$pull:{"system
 
 pull with partNumber 
 db.projects.updateOne({"name":"PROJECT", "systems.name":"Fire"}, {$pull:{"systems.$.materials":{partNumber:"AAA"}}})
+
+
+when updating material if name changes new material is inserted - not OK
+after inserting a material return only inserted material not whole document - Not OK

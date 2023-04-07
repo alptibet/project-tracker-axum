@@ -1,50 +1,61 @@
-use crate::appstate::AppState;
-use crate::controllers::contractors;
+use crate::controllers::systems;
 use crate::errors::AppError;
-use crate::models::contractors::{Contractor, ContractorInput};
 use crate::models::response::{DocResponse, MessageResponse, VecResponse};
+use crate::models::systems::SystemInput;
 use crate::utils::parse_oid;
+use crate::{appstate::AppState, models::systems::System};
 use axum::extract::{Json, Path, State};
+use axum::routing::{delete, get, patch, post};
+use axum::Router;
 
-pub async fn get_all_contractors(
+pub fn create_systems_routes() -> Router<AppState> {
+    Router::new()
+        .route("/", get(get_all_systems))
+        .route("/:id", get(get_one_system))
+        .route("/", post(insert_system))
+        .route("/:id", delete(delete_system))
+        .route("/:id", patch(update_system))
+}
+
+pub async fn get_all_systems(
     State(state): State<AppState>,
-) -> Result<Json<VecResponse<Contractor>>, AppError> {
-    match contractors::get_all(&state.db).await {
-        Ok(contractors_doc) => Ok(Json(VecResponse {
+) -> Result<Json<VecResponse<System>>, AppError> {
+    match systems::get_all(&state.db).await {
+        Ok(systems_doc) => Ok(Json(VecResponse {
             status: "success".to_string(),
-            data: contractors_doc,
+            data: systems_doc,
         })),
         Err(_error) => Err(AppError::NotFound),
     }
 }
 
-pub async fn get_one_contractor(
+pub async fn get_one_system(
     Path(_id): Path<String>,
     State(state): State<AppState>,
-) -> Result<Json<DocResponse<Contractor>>, AppError> {
+) -> Result<Json<DocResponse<System>>, AppError> {
     let oid = parse_oid(_id)?;
-    match contractors::get_one(&state.db, oid).await {
-        Ok(contractor_doc) => {
-            if contractor_doc.is_none() {
+    match systems::get_one(&state.db, oid).await {
+        Ok(system_doc) => {
+            if system_doc.is_none() {
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
                 status: "success".to_string(),
-                data: contractor_doc.unwrap(),
+                data: system_doc.unwrap(),
             }))
         }
         Err(_error) => Err(AppError::NotFound),
     }
 }
 
-pub async fn insert_contractor(
+pub async fn insert_system(
     State(state): State<AppState>,
-    input: ContractorInput,
-) -> Result<Json<DocResponse<Contractor>>, AppError> {
-    match contractors::insert_one(&state.db, Json(input)).await {
-        Ok(contractor_doc) => Ok(Json(DocResponse {
+    input: SystemInput,
+) -> Result<Json<DocResponse<System>>, AppError> {
+    match systems::insert_one(&state.db, Json(input)).await {
+        Ok(_system_doc) => Ok(Json(DocResponse {
             status: "success".to_string(),
-            data: contractor_doc,
+            data: _system_doc,
         })),
         Err(_error) => {
             let res = _error.to_string();
@@ -56,14 +67,14 @@ pub async fn insert_contractor(
     }
 }
 
-pub async fn delete_contractor(
+pub async fn delete_system(
     Path(_id): Path<String>,
     State(state): State<AppState>,
 ) -> Result<Json<MessageResponse>, AppError> {
     let oid = parse_oid(_id)?;
-    match contractors::delete_one(&state.db, oid).await {
-        Ok(contractor_doc) => {
-            if contractor_doc.is_none() {
+    match systems::delete_one(&state.db, oid).await {
+        Ok(system_doc) => {
+            if system_doc.is_none() {
                 return Err(AppError::NotFound);
             }
             Ok(Json(MessageResponse {
@@ -74,20 +85,20 @@ pub async fn delete_contractor(
     }
 }
 
-pub async fn update_contractor(
+pub async fn update_system(
     Path(_id): Path<String>,
     State(state): State<AppState>,
-    input: ContractorInput,
-) -> Result<Json<DocResponse<Contractor>>, AppError> {
+    input: SystemInput,
+) -> Result<Json<DocResponse<System>>, AppError> {
     let oid = parse_oid(_id)?;
-    match contractors::update_one(&state.db, oid, Json(input)).await {
-        Ok(contractor_doc) => {
-            if contractor_doc.is_none() {
+    match systems::update_one(&state.db, oid, Json(input)).await {
+        Ok(system_doc) => {
+            if system_doc.is_none() {
                 return Err(AppError::NotFound);
             }
             Ok(Json(DocResponse {
                 status: "success".to_string(),
-                data: contractor_doc.unwrap(),
+                data: system_doc.unwrap(),
             }))
         }
         Err(error) => {

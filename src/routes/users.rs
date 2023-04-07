@@ -5,7 +5,16 @@ use crate::models::response::{DocResponse, VecResponse};
 use crate::models::users::{Me, User, UserUpdate, ValidUser};
 use crate::utils::parse_oid;
 use axum::extract::{Json, Path, State};
+use axum::routing::{get, patch};
 use axum::Extension;
+use axum::Router;
+
+pub fn create_users_routes() -> Router<AppState> {
+    Router::new()
+        .route("/", get(get_all_users))
+        .route("/:id", get(get_one_user))
+        .route("/:id", patch(update_user))
+}
 
 pub async fn get_all_users(
     State(state): State<AppState>,

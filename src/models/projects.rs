@@ -146,8 +146,23 @@ pub struct ProjectInput {
     pub completionDate: String,
     #[validate(required(message = "Project must have a contractor"))]
     pub contractor: Option<String>,
-    #[validate(custom = "validate_system")]
+    #[validate(custom = "validate_system_input")]
     pub systems: Vec<SystemWithMaterials>,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize, Validate)]
+pub struct ProjectUpdate {
+    #[validate(length(min = 3, message = "Name must be at least 3 characters long"))]
+    pub name: String,
+    pub address: String,
+    pub active: bool,
+    pub completed: bool,
+    pub duration: i32,
+    pub startDate: String,
+    pub completionDate: String,
+    #[validate(required(message = "Project must have a contractor"))]
+    pub contractor: Option<String>,
 }
 
 #[async_trait]
@@ -174,8 +189,32 @@ where
     }
 }
 
+#[async_trait]
+impl<S, B> FromRequest<S, B> for ProjectUpdate
+where
+    B: HttpBody + Send + 'static,
+    B::Data: Send,
+    B::Error: Into<BoxError>,
+    S: Send + Sync,
+{
+    type Rejection = (StatusCode, Json<Value>);
+    async fn from_request(req: Request<B>, _state: &S) -> Result<Self, Self::Rejection> {
+        let Json(project) = req.extract::<Json<ProjectUpdate>, _>().await.unwrap();
+        if let Err(errors) = project.validate() {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                Json(json!({
+                    "message":"validation error",
+                    "errors": errors
+                })),
+            ));
+        }
+        Ok(project)
+    }
+}
+
 //Could not use Enum variants in this function, why? Ugly
-fn validate_system(systems: &[SystemWithMaterials]) -> Result<(), ValidationError> {
+fn validate_system_input(systems: &[SystemWithMaterials]) -> Result<(), ValidationError> {
     let mut validated: bool = false;
     'outer: for system in systems {
         let name = matches!(system.name.as_str(), "Fire" | "Hvac" | "Public");

@@ -11,7 +11,7 @@ use mongodb::{
 
 use crate::models::projects::{
     DeletedProject, MaterialWithSysIndicator, ProjectDocumentToDelete,
-    ProjectDocumentWithMaterials, ProjectDocumentWithoutMaterials, ProjectInput,
+    ProjectDocumentWithMaterials, ProjectDocumentWithoutMaterials, ProjectInput, ProjectUpdate,
     ProjectWithMaterials, ProjectWithoutMaterials, UpdatedMaterials, UpdatedMaterialsDocument,
 };
 
@@ -129,7 +129,7 @@ pub async fn insert_one(
 pub async fn update_one(
     db: &Database,
     oid: ObjectId,
-    input: Json<ProjectInput>,
+    input: Json<ProjectUpdate>,
 ) -> mongodb::error::Result<Option<ProjectWithoutMaterials>> {
     let collection = db.collection::<ProjectDocumentWithoutMaterials>("projects");
     let update_options = FindOneAndUpdateOptions::builder()
@@ -140,12 +140,11 @@ pub async fn update_one(
     let start_dt: bson::DateTime = chrono_dt.into();
     let chrono_dt: chrono::DateTime<Utc> = input.completionDate.parse().unwrap();
     let completion_dt: bson::DateTime = chrono_dt.into();
-    let systems = bson::to_bson(&input.systems).unwrap();
 
     let project_doc = collection
     .find_one_and_update(
         doc! {"_id":oid},
-        doc! {"$set":{"name": &input.name, "address":&input.address, "active": &input.active, "completed": &input.completed,"duration":&input.duration, "startDate": start_dt, "completionDate": completion_dt, "contractor":&input.contractor, "systems":systems}}, update_options).await?;
+        doc! {"$set":{"name": &input.name, "address":&input.address, "active": &input.active, "completed": &input.completed,"duration":&input.duration, "startDate": start_dt, "completionDate": completion_dt, "contractor":&input.contractor}}, update_options).await?;
 
     if project_doc.is_none() {
         return Ok(None);

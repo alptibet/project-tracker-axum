@@ -7,6 +7,17 @@ use crate::{
     utils::parse_oid,
 };
 use axum::extract::{Json, Path, State};
+use axum::routing::{delete, get, patch, post};
+use axum::Router;
+
+pub fn create_materials_routes() -> Router<AppState> {
+    Router::new()
+        .route("/", get(get_all_materials))
+        .route("/:id", get(get_one_material))
+        .route("/", post(insert_material))
+        .route("/:id", delete(delete_material))
+        .route("/:id", patch(update_material))
+}
 
 pub async fn get_all_materials(
     State(state): State<AppState>,
