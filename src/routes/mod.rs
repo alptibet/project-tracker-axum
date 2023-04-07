@@ -30,14 +30,14 @@ use axum::{
 };
 
 use tower_cookies::CookieManagerLayer;
-use tower_http::{cors::CorsLayer, trace::TraceLayer};
+use tower_http::{cors::CorsLayer, services::ServeDir, trace::TraceLayer};
 
 pub async fn create_routes(appstate: AppState) -> Router {
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
         .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE])
         .allow_credentials(true)
-        .allow_origin("http://localhost:5174".parse::<HeaderValue>().unwrap());
+        .allow_origin("http://localhost:3000".parse::<HeaderValue>().unwrap());
 
     tracing_subscriber::fmt::init();
 
@@ -46,6 +46,7 @@ pub async fn create_routes(appstate: AppState) -> Router {
     let system_routes = create_systems_routes();
     let projects_routes = create_projects_routes();
     let user_routes = create_users_routes();
+    let view_routes = create_view_routes();
 
     Router::new()
         .nest("/api/v1/contractors", contrators_routes)
@@ -59,11 +60,12 @@ pub async fn create_routes(appstate: AppState) -> Router {
             appstate.clone(),
             authenticate_user,
         ))
-        .nest("/", create_view_routes())
+        .nest("/", view_routes)
         .route("/api/v1/logout", post(logout))
         .route("/api/v1/signup", post(signup))
         .route("/api/v1/login", post(login))
         .with_state(appstate)
+        .nest_service("/public", ServeDir::new("public"))
         .layer(cors)
         .layer(CookieManagerLayer::new())
         .layer(TraceLayer::new_for_http())

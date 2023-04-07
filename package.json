@@ -1,0 +1,23 @@
+{
+  "name": "project-tracker",
+  "version": "1.0.0",
+  "description": "project tracking application",
+  "main": "app.js",
+  "app": "bundle.js",
+  "targets": {
+    "app": {
+      "source": "./public/js/index.js",
+      "distDir": "./public/js",
+      "engines": {
+        "browsers": "defaults"
+      }
+    }
+  },
+  "scripts": {
+    "watch:js": "parcel watch --target=app",
+    "build:js": "parcel build --target=app"
+  },
+  "devDependencies": {
+    "parcel": "^2.8.3"
+  }
+}
