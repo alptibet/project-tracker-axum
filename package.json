@@ -1,5 +1,31 @@
 {
-  "devDependencies": {
-    "@parcel/transformer-react-refresh-wrap": "^2.8.3"
+  "name": "project-tracker",
+  "version": "1.0.0",
+  "description": "project tracking application",
+  "main": "app.js",
+  "app": "bundle.js",
+  "targets": {
+    "app": {
+      "source": "./public/js/index.js",
+      "distDir": "./public/js",
+      "engines": {
+        "browsers": "defaults"
+      }
+    },
+    "css": {
+      "source": "./public/css/main.css",
+      "distDir": "./public/css",
+      "engines": {
+        "browsers": "defaults"
+      }
+    }
+  },
+  "scripts": {
+    "watch:js": "parcel watch --target=app",
+    "watch": "parcel watch",
+    "build": "parcel build"
+  },
+  "dependencies": {
+    "parcel": "^2.8.3"
   }
 }

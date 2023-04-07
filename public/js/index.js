@@ -1,1 +1,1 @@
-console.log("DENEME DENEME");
+console.log("xasdfsaf");

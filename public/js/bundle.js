@@ -557,7 +557,7 @@ function hmrAccept(bundle, id) {
 }
 
 },{}],"7rpXq":[function(require,module,exports) {
-console.log("DENEME DENEME");
+console.log("xasdfsaf");
 
 },{}]},["hP8ld","7rpXq"], "7rpXq", "parcelRequiredfee")
 

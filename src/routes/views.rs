@@ -9,6 +9,7 @@ use axum::{routing::get, Router};
 
 struct HelloTemplate<'a> {
     name: &'a str,
+    title: &'a str,
 }
 
 pub fn create_view_routes() -> Router<AppState> {
@@ -16,7 +17,10 @@ pub fn create_view_routes() -> Router<AppState> {
 }
 
 pub async fn render_home() -> impl IntoResponse {
-    let hello = HelloTemplate { name: "Alp" };
+    let hello = HelloTemplate {
+        name: "Alp",
+        title: "AT LAST",
+    };
     match hello.render() {
         Ok(html) => Html(html).into_response(),
         Err(err) => (

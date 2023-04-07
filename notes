@@ -4,9 +4,12 @@ db.projects.updateOne({"name":"PROJECT", "systems.name":"Fire"}, {$push:{"system
 pull and push to update
 db.projects.updateOne({"name":"PROJECT", "systems.name":"Fire"}, {$pull:{"systems.$.materials":{"brand":"BOSCH", "partNumber":"BUAT", "qty":12}}})
 
-pull with partNumber 
+pull with partNumber
 db.projects.updateOne({"name":"PROJECT", "systems.name":"Fire"}, {$pull:{"systems.$.materials":{partNumber:"AAA"}}})
-
 
 when updating material if name changes new material is inserted - not OK
 after inserting a material return only inserted material not whole document - Not OK
+
+seems like auth bearer does not work with postman requests
+
+how to seperate development and prod mode
