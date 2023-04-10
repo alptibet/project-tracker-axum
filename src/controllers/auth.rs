@@ -7,7 +7,7 @@ use axum::Extension;
 use axum::{
     extract::{State, TypedHeader},
     headers,
-    http::Request,
+    http::{self, Request},
     middleware::Next,
     response::Response,
 };
@@ -105,7 +105,7 @@ pub async fn authenticate_user<B>(
     next: Next<B>,
 ) -> Result<Response, AppError> {
     let token: Option<String>;
-    let auth_bearer = req.headers().get("authorization");
+    let auth_bearer = req.headers().get(http::header::AUTHORIZATION);
     if auth_bearer.is_none() && cookies.is_none() {
         return Err(AppError::NoAuth);
     }
