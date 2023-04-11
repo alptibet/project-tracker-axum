@@ -22,10 +22,14 @@
   },
   "scripts": {
     "watch:js": "parcel watch --target=app",
+    "watch:css": "parcel watch --target=css",
     "watch": "parcel watch",
     "build": "parcel build"
   },
   "dependencies": {
     "parcel": "^2.8.3"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.1"
   }
 }

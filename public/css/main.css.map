@@ -1,1 +1,1 @@
-{"mappings":"AAAA;;;;AAIA","sources":["public/css/main.css"],"sourcesContent":["body {\n  background: gray;\n}\n\nh1 {\n  color: red;\n}"],"names":[],"version":3,"file":"main.css.map","sourceRoot":"../../"}
+{"mappings":"AAAA","sources":["public/css/main.css"],"sourcesContent":["body {\n  background-color: blue;\n}\n"],"names":[],"version":3,"file":"main.css.map","sourceRoot":"../../"}

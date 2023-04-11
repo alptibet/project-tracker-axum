@@ -5,10 +5,8 @@ use axum::response::{Html, IntoResponse};
 use axum::{routing::get, Router};
 
 #[derive(Template)]
-#[template(path = "base.html")]
-
-struct HelloTemplate<'a> {
-    name: &'a str,
+#[template(path = "home.html")]
+struct HomeTemplate<'a> {
     title: &'a str,
 }
 
@@ -17,11 +15,10 @@ pub fn create_view_routes() -> Router<AppState> {
 }
 
 pub async fn render_home() -> impl IntoResponse {
-    let hello = HelloTemplate {
-        name: "Alp",
-        title: "AT LAST",
+    let home = HomeTemplate {
+        title: "Project Tracker",
     };
-    match hello.render() {
+    match home.render() {
         Ok(html) => Html(html).into_response(),
         Err(err) => (
             StatusCode::INTERNAL_SERVER_ERROR,
