@@ -2,27 +2,18 @@
   "name": "project-tracker",
   "version": "1.0.0",
   "description": "project tracking application",
-  "main": "app.js",
   "app": "bundle.js",
   "targets": {
     "app": {
       "source": "./public/js/index.js",
-      "distDir": "./public/js",
-      "engines": {
-        "browsers": "defaults"
-      }
+      "distDir": "./public/js"
     },
     "css": {
-      "source": "./public/css/main.css",
-      "distDir": "./public/css",
-      "engines": {
-        "browsers": "defaults"
-      }
+      "source": "./main.css",
+      "distDir": "./public/css"
     }
   },
   "scripts": {
-    "watch:js": "parcel watch --target=app",
-    "watch:css": "parcel watch --target=css",
     "watch": "parcel watch",
     "build": "parcel build"
   },
@@ -30,6 +21,10 @@
     "parcel": "^2.8.3"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "cssnano": "^5.1.15",
+    "postcss": "^8.4.21",
+    "postcss-import": "^15.1.0",
     "tailwindcss": "^3.3.1"
   }
 }
