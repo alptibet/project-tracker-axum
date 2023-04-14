@@ -28,7 +28,7 @@ pub fn create_send_token<'a>(_id: &str) -> Cookie<'a> {
     let exp = OffsetDateTime::now_utc() + Duration::hours(1);
     Cookie::build("token", sign_token(_id))
         .path("/")
-        .secure(false)
+        .secure(true)
         .same_site(tower_cookies::cookie::SameSite::None)
         .http_only(true)
         .expires(exp)
@@ -64,7 +64,7 @@ pub fn disable_token<'a>() -> Cookie<'a> {
     let exp = OffsetDateTime::now_utc() + Duration::seconds(10);
     Cookie::build("token", "byebye")
         .path("/")
-        .secure(false)
+        .secure(true)
         .http_only(true)
         .expires(exp)
         .finish()
