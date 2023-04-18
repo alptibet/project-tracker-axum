@@ -46,7 +46,7 @@ pub async fn create_routes(appstate: AppState) -> Router {
     let system_routes = create_systems_routes();
     let projects_routes = create_projects_routes();
     let user_routes = create_users_routes();
-    let view_routes = create_view_routes();
+    let view_routes = create_view_routes(appstate.clone());
 
     Router::new()
         .nest("/api/v1/contractors", contrators_routes)
