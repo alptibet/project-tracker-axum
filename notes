@@ -13,3 +13,7 @@ after inserting a material return only inserted material not whole document - No
 seems like auth bearer does not work with postman requests
 
 how to seperate development and prod mode
+
+look here!
+https://github.com/tokio-rs/axum/blob/c31bea2f96d6e4ce20b32e556b56cca0b51c41de/axum/src/docs/middleware.md?plain=1#L504
+seperate public view routes and protected view routes
