@@ -1,13 +1,10 @@
 use crate::appstate::AppState;
-use crate::controllers::auth::authenticate_user;
 use askama::Template;
-use axum::middleware;
 use axum::{routing::get, Router};
 
-pub fn create_view_routes(appstate: AppState) -> Router<AppState> {
+pub fn create_view_routes() -> Router<AppState> {
     Router::new()
         .route("/overview", get(render_overview))
-        .route_layer(middleware::from_fn_with_state(appstate, authenticate_user))
         .route("/", get(render_home))
 }
 
