@@ -5,10 +5,7 @@ use axum::{middleware, routing::get, Extension, Router};
 pub fn create_view_routes(appstate: AppState) -> Router<AppState> {
     Router::new()
         .route("/overview", get(render_overview))
-        .route_layer(middleware::from_fn_with_state(
-            appstate.clone(),
-            authenticate_user,
-        ))
+        .route_layer(middleware::from_fn_with_state(appstate, authenticate_user))
         .route("/", get(render_home))
 }
 
