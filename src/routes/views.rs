@@ -31,7 +31,7 @@ pub struct OverviewTemplate<'a> {
 
 pub async fn render_overview(Extension(user): Extension<ValidUser>) -> OverviewTemplate<'static> {
     OverviewTemplate {
-        title: "Testing",
+        title: "DENEME",
         name: user.name,
         surname: user.surname,
     }

@@ -1,9 +1,0 @@
-// ./.postcssrc
-{
-  "plugins": {
-    "postcss-import": {},
-    "tailwindcss/nesting": {},
-    "tailwindcss": {},
-    "cssnano": {}
-  }
-}
