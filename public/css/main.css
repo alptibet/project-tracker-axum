@@ -21,4 +21,8 @@ img, picture, svg, video {
   display: block;
 }
 
+body {
+  background-color: red;
+}
+
 /*# sourceMappingURL=main.css.map */

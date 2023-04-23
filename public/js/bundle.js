@@ -580,15 +580,18 @@ const login = async (username, password)=>{
     try {
         const res = await (0, _axiosDefault.default)({
             method: "post",
-            url: "http://localhost:3000/api/v1/login",
+            url: "http://localhost:3000/api/v1/users/login",
             data,
             withCredentials: true
         });
-        if (res.data.status === "success") window.setTimeout(()=>{
-            location.assign("overview");
-        });
+        if (res.data.status === "success") {
+            alert("Loggin in");
+            window.setTimeout(()=>{
+                location.assign("/overview");
+            });
+        }
     } catch (error) {
-        console.log("Error");
+        alert(error.response.data.message);
     }
 };
 
@@ -853,8 +856,9 @@ const typeOfTest = (type)=>(thing)=>typeof thing === type;
  *
  * @returns {boolean} True if value is an FormData, otherwise false
  */ const isFormData = (thing)=>{
-    const pattern = "[object FormData]";
-    return thing && (typeof FormData === "function" && thing instanceof FormData || toString.call(thing) === pattern || isFunction(thing.toString) && thing.toString() === pattern);
+    let kind;
+    return thing && (typeof FormData === "function" && thing instanceof FormData || isFunction(thing.append) && ((kind = kindOf(thing)) === "formdata" || // detect form-data instance
+    kind === "object" && isFunction(thing.toString) && thing.toString() === "[object FormData]"));
 };
 /**
  * Determine if a value is a URLSearchParams object
@@ -4559,7 +4563,7 @@ exports.default = {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "VERSION", ()=>VERSION);
-const VERSION = "1.3.5";
+const VERSION = "1.3.6";
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"45wzn":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
