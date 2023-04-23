@@ -21,17 +21,27 @@ img, picture, svg, video {
 }
 
 .loginform__container {
-  width: 20%;
+  width: auto;
+  outline: 2px solid red;
   margin: auto;
+  padding: 1rem;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
+.loginform__container input {
+  margin: 1rem;
+  font-size: 1.6rem;
+}
+
+.loginform__container button, .loginform__container a {
+  margin: 1rem;
+}
+
 body {
   background-color: #242933;
-  border: 2px solid green;
   position: relative;
 }
 

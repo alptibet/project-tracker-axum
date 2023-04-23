@@ -1,8 +1,23 @@
 .loginform__container {
+  outline: 2px red solid;
   margin: auto;
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 20%;
   transform: translate(-50%, -50%);
+  width: auto;
+  padding: 1rem;
+
+  input {
+    font-size: 1.6rem;
+    margin: 1rem;
+  }
+
+  button {
+    margin: 1rem;
+  }
+
+  a {
+    margin: 1rem;
+  }
 }
