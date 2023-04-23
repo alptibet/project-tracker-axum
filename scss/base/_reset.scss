@@ -3,25 +3,20 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-}
-
-/* remove default spacing */
-/* force styling of type through styling, rather than elements */
-
-* {
   margin: 0;
   padding: 0;
+  box-sizing: inherit;
   font: inherit;
 }
 
-/* dark mode user-agent-styles */
+html {
+  box-sizing: border-box;
+  font-size: 62.5%;
+}
 
 html {
   color-scheme: dark light;
 }
-
-/* min body height */
 
 body {
   min-height: 100vh;

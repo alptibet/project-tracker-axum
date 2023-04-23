@@ -1,15 +1,14 @@
 *, :before, :after {
-  box-sizing: border-box;
-}
-
-* {
+  box-sizing: inherit;
   font: inherit;
   margin: 0;
   padding: 0;
 }
 
 html {
+  box-sizing: border-box;
   color-scheme: dark light;
+  font-size: 62.5%;
 }
 
 body {
@@ -21,8 +20,19 @@ img, picture, svg, video {
   display: block;
 }
 
+.loginform__container {
+  width: 20%;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 body {
-  background-color: red;
+  background-color: #242933;
+  border: 2px solid green;
+  position: relative;
 }
 
 /*# sourceMappingURL=main.css.map */

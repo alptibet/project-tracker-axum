@@ -580,18 +580,13 @@ const login = async (username, password)=>{
     try {
         const res = await (0, _axiosDefault.default)({
             method: "post",
-            url: "http://localhost:3000/api/v1/users/login",
+            url: "http://localhost:3000/api/v1/login",
             data,
             withCredentials: true
         });
-        if (res.data.status === "success") {
-            alert("Loggin in");
-            window.setTimeout(()=>{
-                location.assign("/overview");
-            });
-        }
+        if (res.data.status === "success") location.assign("overview");
     } catch (error) {
-        alert(error.response.data.message);
+        console.log(error);
     }
 };
 
