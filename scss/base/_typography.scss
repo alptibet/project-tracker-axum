@@ -1,0 +1,36 @@
+@use "../abstracts/variables" as *;
+
+@font-face {
+  font-family: JetBrainsMono;
+  src: url("../public/fonts/JetBrainsMono-Regular.woff2") format("woff");
+}
+
+@font-face {
+  font-family: JetBrainsMono-Bold;
+  src: url("../public/fonts/JetBrainsMono-Bold.woff2") format("woff");
+}
+
+@font-face {
+  font-family: JetBrainsMono-Thin;
+  src: url("../public/fonts/JetBrainsMono-Thin.woff2") format("woff");
+}
+
+body {
+  font-family: JetBrainsMono;
+}
+
+.form-login__item {
+  font-size: 1.6rem;
+
+  &-btn {
+    font-family: JetBrainsMono-Bold;
+  }
+}
+
+.text-green {
+  color: $green;
+}
+
+.text-yellow {
+  color: $yellow;
+}

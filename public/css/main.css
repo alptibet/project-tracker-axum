@@ -20,9 +20,52 @@ img, picture, svg, video {
   display: block;
 }
 
-.loginform__container {
+@font-face {
+  font-family: JetBrainsMono;
+  src: url("JetBrainsMono-Regular.f47db687.woff2") format("woff");
+}
+
+@font-face {
+  font-family: JetBrainsMono-Bold;
+  src: url("JetBrainsMono-Bold.9db08082.woff2") format("woff");
+}
+
+@font-face {
+  font-family: JetBrainsMono-Thin;
+  src: url("JetBrainsMono-Thin.7615cab6.woff2") format("woff");
+}
+
+body {
+  font-family: JetBrainsMono;
+}
+
+.form-login__item {
+  font-size: 1.6rem;
+}
+
+.form-login__item-btn {
+  font-family: JetBrainsMono-Bold;
+}
+
+.text-green {
+  color: #a3be8c;
+}
+
+.text-yellow {
+  color: #ebcb8b;
+}
+
+body {
+  background-color: #242933;
+  position: relative;
+}
+
+a, a:visited, a:hover, a:active {
+  text-decoration: none;
+}
+
+.form-container {
   width: auto;
-  outline: 2px solid red;
   margin: auto;
   padding: 1rem;
   position: absolute;
@@ -31,18 +74,29 @@ img, picture, svg, video {
   transform: translate(-50%, -50%);
 }
 
-.loginform__container input {
-  margin: 1rem;
-  font-size: 1.6rem;
+.form-login__item {
+  margin: 1.5rem;
 }
 
-.loginform__container button, .loginform__container a {
-  margin: 1rem;
+.form-login__item-input {
+  background-color: inherit;
+  color: #bf616a;
+  border: 1px solid #bf616a;
+  border-radius: 4px;
+  padding: 1rem;
 }
 
-body {
-  background-color: #242933;
-  position: relative;
+.form-login__item-input:focus {
+  outline: none;
+}
+
+.form-login__item-btn {
+  color: #fff;
+  cursor: pointer;
+  background-color: #bf616a;
+  border: none;
+  border-radius: 4px;
+  padding: 1rem 2rem;
 }
 
 /*# sourceMappingURL=main.css.map */
