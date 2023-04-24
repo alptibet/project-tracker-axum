@@ -30,7 +30,7 @@ impl IntoResponse for AppError {
             Self::DuplicateRecord => (StatusCode::BAD_REQUEST, "Duplicate record found"),
             // Self::InternalServerError => (StatusCode::BAD_REQUEST, "Something went wrong"),
             Self::BadRequest => (StatusCode::BAD_REQUEST, "Unable to complete request"),
-            Self::UserDoesNotExist => (StatusCode::BAD_REQUEST, "User does not exist"),
+            Self::UserDoesNotExist => (StatusCode::UNAUTHORIZED, "User does not exist"),
             Self::UserNotActive => (StatusCode::FORBIDDEN, "Your account is not active"),
             Self::WrongCredentials => (StatusCode::UNAUTHORIZED, "Wrong user credentials"),
             Self::UserAlreadyExists => (StatusCode::BAD_REQUEST, "This username is already taken"),

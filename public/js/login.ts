@@ -15,6 +15,8 @@ export const login = async (username: string, password: string) => {
     });
     if (res.data.status === "success") {
       location.assign("overview");
+    } else {
+      location.assign("/");
     }
   } catch (error) {
     console.log(error);
