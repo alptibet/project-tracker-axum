@@ -1,5 +1,4 @@
 import { login } from "./login";
-import { rain } from "./rain";
 
 const loginForm = document.querySelector(".form-login");
 if (loginForm) {
