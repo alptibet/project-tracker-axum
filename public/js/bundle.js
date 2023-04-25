@@ -585,9 +585,11 @@ const login = async (username, password)=>{
             withCredentials: true
         });
         if (res.data.status === "success") location.assign("overview");
-        else location.assign("/");
+        else location.assign("/"); //not sure
     } catch (error) {
         console.log(error);
+    //must handle here
+    //better view a warning model and loc assign to home again
     }
 };
 

@@ -39,11 +39,11 @@ body {
   font-family: JetBrainsMono;
 }
 
-.form-login__item {
+.form__item {
   font-size: 1.6rem;
 }
 
-.form-login__item-btn {
+.form__item-btn {
   font-family: JetBrainsMono-Bold;
 }
 
@@ -74,29 +74,47 @@ a, a:visited, a:hover, a:active {
   transform: translate(-50%, -50%);
 }
 
-.form-login__item {
+.form__item {
   margin: 1.5rem;
 }
 
-.form-login__item-input {
+.form__item-input {
+  width: 24rem;
   background-color: inherit;
   color: #bf616a;
   border: 1px solid #bf616a;
   border-radius: 4px;
-  padding: 1rem;
+  padding: 1.4rem;
 }
 
-.form-login__item-input:focus {
+.form__item-input:focus {
   outline: none;
 }
 
-.form-login__item-btn {
+.form__item-btn {
+  width: 12rem;
   color: #fff;
   cursor: pointer;
   background-color: #bf616a;
   border: none;
   border-radius: 4px;
   padding: 1rem 2rem;
+}
+
+.btn-green {
+  background-color: #a3be8c;
+}
+
+.btn-red {
+  background-color: #bf616a;
+}
+
+.w11 {
+  width: 11rem;
+}
+
+.ml1 {
+  margin-left: 1rem;
 }
 
 /*# sourceMappingURL=main.css.map */

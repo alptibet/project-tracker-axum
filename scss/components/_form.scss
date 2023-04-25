@@ -1,11 +1,12 @@
 @use "../abstracts/variables" as *;
 
-.form-login {
+.form {
   &__item {
     margin: 1.5rem;
 
     &-input {
-      padding: 1rem;
+      width: 24rem;
+      padding: 1.4rem;
       border: $red 1px solid;
       border-radius: 4px;
       background-color: inherit;
@@ -17,6 +18,7 @@
     }
 
     &-btn {
+      width: 12rem;
       padding: 1rem 2rem;
       color: white;
       background-color: $red;

@@ -6,6 +6,7 @@ pub fn create_view_routes(appstate: AppState) -> Router<AppState> {
     Router::new()
         .route("/overview", get(render_overview))
         .route_layer(middleware::from_fn_with_state(appstate, authenticate_user))
+        .route("/signup", get(render_signup))
         .route("/", get(render_home))
 }
 
@@ -16,9 +17,17 @@ pub struct HomeTemplate<'a> {
 }
 
 pub async fn render_home() -> HomeTemplate<'static> {
-    HomeTemplate {
-        title: "Project Tracker",
-    }
+    HomeTemplate { title: "LOGIN" }
+}
+
+#[derive(Template)]
+#[template(path = "signup.html")]
+pub struct SignupTemplate<'a> {
+    title: &'a str,
+}
+
+pub async fn render_signup() -> SignupTemplate<'static> {
+    SignupTemplate { title: "SIGNUP" }
 }
 
 #[derive(Template)]
@@ -31,7 +40,7 @@ pub struct OverviewTemplate<'a> {
 
 pub async fn render_overview(Extension(user): Extension<ValidUser>) -> OverviewTemplate<'static> {
     OverviewTemplate {
-        title: "DENEME",
+        title: "PROJECTS",
         name: user.name,
         surname: user.surname,
     }
