@@ -558,6 +558,7 @@ function hmrAccept(bundle, id) {
 
 },{}],"8kn37":[function(require,module,exports) {
 var _login = require("./login");
+var _signup = require("./signup");
 const loginForm = document.querySelector(".form-login");
 if (loginForm) loginForm.addEventListener("submit", (e)=>{
     e.preventDefault();
@@ -565,8 +566,21 @@ if (loginForm) loginForm.addEventListener("submit", (e)=>{
     const password = document.getElementById("password").value;
     (0, _login.login)(username, password);
 });
+const signupForm = document.querySelector(".form-signup");
+if (signupForm) signupForm.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const newUser = {
+        name: document.getElementById("name").value,
+        surname: document.getElementById("surname").value,
+        username: document.getElementById("username").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        passwordConfirm: document.getElementById("confirm").value
+    };
+    (0, _signup.signup)(newUser);
+});
 
-},{"./login":"31IiT"}],"31IiT":[function(require,module,exports) {
+},{"./login":"31IiT","./signup":"jMBcg"}],"31IiT":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "login", ()=>login);
@@ -4745,6 +4759,29 @@ Object.entries(HttpStatusCode).forEach(([key, value])=>{
 });
 exports.default = HttpStatusCode;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["loBKd","8kn37"], "8kn37", "parcelRequiredfee")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jMBcg":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "signup", ()=>signup);
+var _axios = require("axios");
+var _axiosDefault = parcelHelpers.interopDefault(_axios);
+const signup = async (newUser)=>{
+    try {
+        const res = await (0, _axiosDefault.default)({
+            method: "post",
+            url: "http://localhost:3000/api/v1/signup",
+            data: newUser,
+            withCredentials: true
+        });
+        if (res.data.status === "success") {
+            alert("Account created");
+            location.assign("overview");
+        } else location.assign("/"); //not sure
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+},{"axios":"jo6P5","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["loBKd","8kn37"], "8kn37", "parcelRequiredfee")
 
 //# sourceMappingURL=bundle.js.map

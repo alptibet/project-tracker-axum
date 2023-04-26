@@ -2,7 +2,7 @@ use crate::appstate::AppState;
 use crate::controllers::auth;
 use crate::controllers::users;
 use crate::errors::AppError;
-use crate::models::auth::{UserInput, UserLogin};
+use crate::models::auth::{NewUser, UserLogin};
 use crate::models::response::DocResponse;
 use crate::models::response::MessageResponse;
 
@@ -13,7 +13,7 @@ use tower_cookies::Cookies;
 pub async fn signup(
     State(state): State<AppState>,
     cookies: Cookies,
-    input: UserInput,
+    input: NewUser,
 ) -> Result<Json<MessageResponse>, AppError> {
     match users::insert_one(&state.db, Json(input)).await {
         Ok(_user_doc) => {

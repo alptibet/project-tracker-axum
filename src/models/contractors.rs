@@ -9,10 +9,8 @@ use axum::{
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use typeshare::typeshare;
 use validator::Validate;
 
-#[typeshare]
 #[derive(Deserialize, Serialize)]
 pub struct Contractor {
     pub _id: String,

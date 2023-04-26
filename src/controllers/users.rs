@@ -1,4 +1,4 @@
-use crate::models::auth::UserInput;
+use crate::models::auth::NewUser;
 use crate::models::users::{Me, User, UserDocument, UserRole, UserUpdate};
 use axum::Json;
 use bcrypt::hash;
@@ -72,7 +72,7 @@ pub async fn find_one(db: &Database, oid: ObjectId) -> mongodb::error::Result<Op
     Ok(Some(user_json))
 }
 
-pub async fn insert_one(db: &Database, input: Json<UserInput>) -> mongodb::error::Result<User> {
+pub async fn insert_one(db: &Database, input: Json<NewUser>) -> mongodb::error::Result<User> {
     let collection = db.collection::<Document>("users");
     let password_created_at: DateTime = DateTime::now();
     let hashed_password = hash(&input.password, 12).unwrap();

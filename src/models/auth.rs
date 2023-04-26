@@ -35,9 +35,10 @@ pub struct UserId {
     pub _id: String,
 }
 
+#[typeshare]
 #[allow(non_snake_case)]
 #[derive(Deserialize, Validate)]
-pub struct UserInput {
+pub struct NewUser {
     pub name: String,
     pub surname: String,
     #[validate(length(min = 4, message = "Username must be at least 4 characters long"))]
@@ -51,7 +52,7 @@ pub struct UserInput {
 }
 
 #[async_trait]
-impl<S, B> FromRequest<S, B> for UserInput
+impl<S, B> FromRequest<S, B> for NewUser
 where
     B: HttpBody + Send + 'static,
     B::Data: Send,
@@ -60,7 +61,7 @@ where
 {
     type Rejection = (StatusCode, Json<Value>);
     async fn from_request(req: Request<B>, _state: &S) -> Result<Self, Self::Rejection> {
-        let Json(user) = req.extract::<Json<UserInput>, _>().await.unwrap();
+        let Json(user) = req.extract::<Json<NewUser>, _>().await.unwrap();
         if let Err(errors) = user.validate() {
             return Err((
                 StatusCode::BAD_REQUEST,

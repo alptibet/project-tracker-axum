@@ -7,12 +7,12 @@ export interface UserLogin {
 	password: string;
 }
 
-export interface Contractor {
-	_id: string;
+export interface NewUser {
 	name: string;
-}
-
-export interface MessageResponse {
-	status: string;
+	surname: string;
+	username: string;
+	email: string;
+	password: string;
+	passwordConfirm: string;
 }
 
