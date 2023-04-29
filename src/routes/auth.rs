@@ -30,6 +30,7 @@ pub async fn signup(
             Ok(Json(MessageResponse {
                 status: "success".to_string(),
             }))
+            //Must return the logged in user
         }
         Err(_error) => {
             let error = _error.kind.to_string();
