@@ -14,7 +14,7 @@ pub async fn signup(
     State(state): State<AppState>,
     cookies: Cookies,
     input: NewUser,
-) -> Result<Json<MessageResponse>, AppError> {
+) -> Result<Json<DocResponse<ValidUser>>, AppError> {
     match users::insert_one(&state.db, Json(input)).await {
         Ok(_user_doc) => {
             match auth::match_auth(&state.db, &_user_doc.username).await {
@@ -27,10 +27,19 @@ pub async fn signup(
                 }
                 Err(_error) => (),
             }
-            Ok(Json(MessageResponse {
+            let user_json = ValidUser {
+                _id: _user_doc._id,
+                name: _user_doc.name,
+                surname: _user_doc.surname,
+                username: _user_doc.username,
+                email: _user_doc.email,
+                active: _user_doc.active,
+                role: _user_doc.role,
+            };
+            Ok(Json(DocResponse {
                 status: "success".to_string(),
+                data: user_json,
             }))
-            //Must return the logged in user
         }
         Err(_error) => {
             let error = _error.kind.to_string();

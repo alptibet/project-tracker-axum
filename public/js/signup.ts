@@ -17,6 +17,5 @@ export const signup = async (newUser: NewUser) => {
     }
   } catch (error) {
     console.log(error);
-    //must handle these
   }
 };
