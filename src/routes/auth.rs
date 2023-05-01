@@ -4,7 +4,6 @@ use crate::controllers::users;
 use crate::errors::AppError;
 use crate::models::auth::{NewUser, UserLogin};
 use crate::models::response::DocResponse;
-use crate::models::response::MessageResponse;
 
 use crate::models::users::ValidUser;
 use axum::extract::{Json, State};
