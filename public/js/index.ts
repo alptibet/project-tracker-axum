@@ -1,6 +1,5 @@
 import type { NewUser } from "../../types";
-import { login } from "./login";
-import { signup } from "./signup";
+import { login, signup } from "./auth";
 
 const loginForm = document.querySelector(".form-login");
 if (loginForm) {
